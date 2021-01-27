@@ -6,9 +6,9 @@ let chatHeader = document.createElement('div');
 chatHeader.className = 'chat-header';
 chatWrapper.appendChild(chatHeader);
 
-let chatContainer = document.createElement('div');
-chatContainer.className = 'chat-container';
-chatWrapper.appendChild(chatContainer);
+let chatArea = document.createElement('div');
+chatArea.className = 'chat-area';
+chatWrapper.appendChild(chatArea);
 
 let visibleChat = [];
 let isFullscreen = false;
@@ -32,7 +32,6 @@ function waitForChat() {
 }
 
 function init() {
-    
     buildChatObserver();
 
     const fsElement = document.querySelector(
@@ -43,6 +42,7 @@ function init() {
     let videoPlayer = document.querySelector('.video-player');
     videoPlayer.addEventListener('fullscreenchange', changedFullscreen, false);
 
+    dragChat();
 }
 
 function changedFullscreen(){
@@ -97,13 +97,47 @@ function addNewChatMsg(mutation) {
         visibleChat.pop()
     }
 
-    chatContainer.innerHTML = '';
+    chatArea.innerHTML = '';
 
-    visibleChat.forEach(message => chatContainer.appendChild(message));
+    visibleChat.forEach(message => chatArea.appendChild(message));
 
 }
 
+function dragChat(){
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 
+    chatHeader.onmousedown = dragMouseDown;
+  
+    function dragMouseDown(e) {
+      e = e || window.event;
+      e.preventDefault();
+      // get the mouse cursor position at startup:
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup = closeDragElement;
+      // call a function whenever the cursor moves:
+      document.onmousemove = elementDrag;
+    }
+  
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+      // calculate the new cursor position:
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      // set the element's new position:
+      chatWrapper.style.top = (chatWrapper.offsetTop - pos2) + "px";
+      chatWrapper.style.left = (chatWrapper.offsetLeft - pos1) + "px";
+    }
+  
+    function closeDragElement() {
+      // stop moving when mouse button is released:
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
+  }
 
 waitForChat();
 

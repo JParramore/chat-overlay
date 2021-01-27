@@ -6,20 +6,20 @@
     flex-direction: column;
 }
 
-.chat-container {
-    display: flex;
-    flex-direction: column-reverse;
-    width: 100%;
-    background-color: blue;
-}
-
-/* 
-.chat-container:hover {
-    overflow-y: scroll;
-} */
-
 .chat-header {
     width: 100%;
-    height: 100px;
-    background-color: wheat;
+    height: 10%;
+}
+
+.chat-header:hover {
+    background-color: grey;
+    opacity: 0.4;
+}
+
+.chat-area {
+    display: flex;
+    flex-direction: column-reverse;
+    height: 90%;
+    width: 100%;
+    overflow: hidden;
 }

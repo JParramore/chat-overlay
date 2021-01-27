@@ -9,8 +9,7 @@
         "https://www.twitch.tv/*"
       ],
       "js": ["content.js"],
-      "css": ["styles.css"],
-      "run_at": "document_end"
+      "css": ["styles.css"]
     }
   ],
   "manifest_version": 2
