@@ -8,4 +8,4 @@ Simple chrome extension for twitch that allows users to view twitch chat in full
 
 Movable, resizable, transparent chat box overlay:
 
-![Alt Text](https://media.giphy.com/media/1Jg2jpghs1Grj5YAPs/giphy.gif "chat on fullscreen video")
+![Demo](demo/vid.gif "chat on fullscreen video")

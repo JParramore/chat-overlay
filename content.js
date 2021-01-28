@@ -36,12 +36,9 @@ function waitForChat() {
     }, 500);
 }
 
-
 function init() {
     buildChatObserver();
-
-    buildVideoSrcObserver();
-
+    buildVideoObserver();
     addChatFunctions();
 }
 
@@ -73,7 +70,7 @@ function buildChatObserver() {
     chatObserver.observe(chatNode, config);
 }
 
-function buildVideoSrcObserver() {
+function buildVideoObserver() {
     if (videoSrcObserver) videoSrcObserver.disconnect();
 
     let videoPlayer = document.querySelector('.video-player');
