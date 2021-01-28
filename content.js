@@ -1,13 +1,19 @@
 let chatWrapper = document.createElement('div');
 chatWrapper.className = 'chat-wrapper';
-chatWrapper.style.display = 'flex'; // TODO NONE
+chatWrapper.style.display = 'flex';
 
 let chatHeader = document.createElement('div');
 chatHeader.className = 'chat-header';
-chatWrapper.appendChild(chatHeader);
+
+let closeBtn = document.createElement('button');
+closeBtn.className = 'close-button'
+closeBtn.innerHTML = 'close';
 
 let chatArea = document.createElement('div');
 chatArea.className = 'chat-area';
+
+chatHeader.appendChild(closeBtn);
+chatWrapper.appendChild(chatHeader);
 chatWrapper.appendChild(chatArea);
 
 let visibleChat = [];
@@ -21,10 +27,8 @@ function waitForChat() {
             console.log('Could not find chat')
             clearInterval(int);
         }
-        console.log("Looking for chat..")
         chat = document.querySelector('.stream-chat .simplebar-scroll-content');
         if (chat) {
-            console.log("Found chat...")
             clearInterval(int);
             init();
         }
@@ -34,24 +38,23 @@ function waitForChat() {
 function init() {
     buildChatObserver();
 
-    const fsElement = document.querySelector(
-        ".video-player__overlay"
-      );
-    fsElement.appendChild(chatWrapper)
-
     let videoPlayer = document.querySelector('.video-player');
     videoPlayer.addEventListener('fullscreenchange', changedFullscreen, false);
 
-    dragChat();
+    addChatFunctions();
 }
 
-function changedFullscreen(){
+function changedFullscreen() {
     isFullscreen = !isFullscreen;
 
     if (isFullscreen) {
-        //chatWrapper.style.display = 'flex';
+        const fsElement = document.querySelector(
+            ".video-player__overlay"
+        );
+        chatWrapper.style.display = 'flex';
+        fsElement.appendChild(chatWrapper);
     } else {
-        // chatWrapper.style.display = 'none';  // TODO NONE UNCOMMENT
+        chatWrapper.remove();
     };
 }
 
@@ -65,9 +68,6 @@ function buildChatObserver() {
             if (mutation.type === 'childList') {
                 addNewChatMsg(mutation);
             }
-            else if (mutation.type === 'attributes') {
-                console.log('The ' + mutation.attributeName + ' attribute was modified.');
-            }
         }
     };
 
@@ -78,7 +78,7 @@ function buildChatObserver() {
     const config = { attributes: true, childList: true, subtree: true };
     observer.observe(chatNode, config);
 
-    // Later, you can stop observing
+    // TODO stop observing at some point
     //observer.disconnect();
 }
 
@@ -87,63 +87,73 @@ function addNewChatMsg(mutation) {
 
     mutation.addedNodes.forEach(node => {
         const clone = node.cloneNode(true);
-        newMessage.appendChild(clone);
+        if (clone.className === 'chat-line__message') newMessage.appendChild(clone);
     })
 
-    visibleChat.unshift(newMessage)
-
-    if (visibleChat.length > 50) {
+    if (visibleChat.length > 100) {
         visibleChat.pop();
     }
+    visibleChat.unshift(newMessage)
 
     chatArea.innerHTML = '';
     visibleChat.forEach(message => chatArea.appendChild(message));
 
 }
 
-function dragChat(){
-
+function addChatFunctions() {
     chatWrapper.onmouseover = () => {
-        chatHeader.style.display = 'block';
+        chatHeader.style.display = 'flex';
+        chatWrapper.style.border = '2px solid grey';
+        chatWrapper.style.resize = 'auto';
     }
     chatWrapper.onmouseout = () => {
         chatHeader.style.display = 'none';
+        chatWrapper.style.borderStyle = 'hidden';
+        chatWrapper.style.resize = 'none';
     }
+    closeBtn.addEventListener("click", function () {
+        chatWrapper.style.display = 'none';
+    });
+
+    dragChat();
+}
+
+// Make chat draggable https://www.w3schools.com/howto/howto_js_draggable.asp
+function dragChat() {
 
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 
     chatHeader.onmousedown = dragMouseDown;
-  
+
     function dragMouseDown(e) {
-      e = e || window.event;
-      e.preventDefault();
-      // get the mouse cursor position at startup:
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      document.onmouseup = closeDragElement;
-      // call a function whenever the cursor moves:
-      document.onmousemove = elementDrag;
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // call a function whenever the cursor moves:
+        document.onmousemove = elementDrag;
     }
-  
+
     function elementDrag(e) {
-      e = e || window.event;
-      e.preventDefault();
-      // calculate the new cursor position:
-      pos1 = pos3 - e.clientX;
-      pos2 = pos4 - e.clientY;
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      // set the element's new position:
-      chatWrapper.style.top = (chatWrapper.offsetTop - pos2) + "px";
-      chatWrapper.style.left = (chatWrapper.offsetLeft - pos1) + "px";
+        e = e || window.event;
+        e.preventDefault();
+        // calculate the new cursor:
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // set the element's new position:
+        chatWrapper.style.top = (chatWrapper.offsetTop - pos2) + "px";
+        chatWrapper.style.left = (chatWrapper.offsetLeft - pos1) + "px";
     }
-  
+
     function closeDragElement() {
-      // stop moving when mouse button is released:
-      document.onmouseup = null;
-      document.onmousemove = null;
+        // stop moving when mouse button is released:
+        document.onmouseup = null;
+        document.onmousemove = null;
     }
-  }
+}
 
 waitForChat();
-
