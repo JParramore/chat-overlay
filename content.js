@@ -53,7 +53,6 @@ function changedFullscreen(){
     } else {
         // chatWrapper.style.display = 'none';  // TODO NONE UNCOMMENT
     };
-    console.log("fs state", isFullscreen)
 }
 
 function buildChatObserver() {
@@ -87,23 +86,30 @@ function addNewChatMsg(mutation) {
     let newMessage = document.createElement('div');
 
     mutation.addedNodes.forEach(node => {
-        const clone = node.cloneNode(true)
-        newMessage.appendChild(clone)
+        const clone = node.cloneNode(true);
+        newMessage.appendChild(clone);
     })
 
     visibleChat.unshift(newMessage)
 
     if (visibleChat.length > 50) {
-        visibleChat.pop()
+        visibleChat.pop();
     }
 
     chatArea.innerHTML = '';
-
     visibleChat.forEach(message => chatArea.appendChild(message));
 
 }
 
 function dragChat(){
+
+    chatWrapper.onmouseover = () => {
+        chatHeader.style.display = 'block';
+    }
+    chatWrapper.onmouseout = () => {
+        chatHeader.style.display = 'none';
+    }
+
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 
     chatHeader.onmousedown = dragMouseDown;
