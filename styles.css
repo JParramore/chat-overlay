@@ -28,9 +28,9 @@
     width: 100%;
     overflow: hidden;
     font-size: 16px;
+    font-style: bold;
 }
 
 .close-button {
-
    padding-right: 10px;
 }
