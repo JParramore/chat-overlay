@@ -31,6 +31,7 @@ function waitForChat() {
         }
         const chat = document.querySelector('.stream-chat .simplebar-scroll-content');
         if (chat) {
+            console.log("chat found");
             clearInterval(int);
             init();
         }
@@ -61,6 +62,8 @@ function changedFullscreen() {
 }
 
 function buildChatObserver() {
+    if (chatObserver) chatObserver.disconnect();
+
     let chatNode = document.querySelector('.stream-chat .simplebar-scroll-content');
     chatObserver = new MutationObserver(function (mutationsList, chatObserver) {
 
@@ -75,31 +78,36 @@ function buildChatObserver() {
 }
 
 function buildVideoSrcObserver() {
+    if (videoSrcObserver) videoSrcObserver.disconnect();
+
     let videoPlayer = document.querySelector('.video-player');
     videoPlayer.addEventListener('fullscreenchange', changedFullscreen, false);
-    const video = videoPlayer.querySelector('video');
+    videoSrcObserver = new MutationObserver(function (mutationsList, videoSrcObserver) {
 
-    videoSrcObserver = new MutationObserver(mutation => {
-        mutation.forEach(change => {
-            if (change.attributeName.includes('src')) {
-                // console.log(video.src);
-                visibleChat = [];
-                chatObserver.disconnect();
-                videoSrcObserver.disconnect();
+        for (const mutation of mutationsList) {
+            if (mutation.attributeName === 'src') {
+                console.log("src change");
+                chatArea.innerHTML = '';
                 waitForChat();
             }
-        });
+            else if (mutation.attributeName === 'data-a-player-type') {
+                console.log("player-type changed")
+                waitForChat();
+            }
+        }
+
     });
-    const config = { attributes: true };
-    videoSrcObserver.observe(video, config);
+    const config = { attributes: true, subtree: true };
+    videoSrcObserver.observe(videoPlayer, config);
 }
 
 function addNewChatMsg(node) {
     const clone = node.cloneNode(true);
-    
-    if (clone.className && clone.className.startsWith('chat-line__message')) {
+
+    if (clone.className && clone.className.startsWith('chat-line')) {
+        console.log("chat-line adding")
         clone.className = 'chat-line__message';
-        if (chatArea.childElementCount > 100) chatArea.removeChild(chatArea.childNodes[chatArea.childElementCount-1]);
+        if (chatArea.childElementCount > 100) chatArea.removeChild(chatArea.childNodes[chatArea.childElementCount - 1]);
         chatArea.prepend(clone)
     }
 }
