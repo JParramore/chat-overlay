@@ -19,8 +19,6 @@ chatWrapper.appendChild(chatArea);
 let chatObserver = null;
 let videoSrcObserver = null;
 
-// let isFullscreen = false;
-
 /** Waits until chat DOM is built and calls init() after */
 function waitForChat() {
     const timeNow = Date.now();
@@ -48,11 +46,7 @@ function init() {
 }
 
 function changedFullscreen() {
-    // isFullscreen = !isFullscreen;
-    
     if(document.fullscreenElement) {
-
-    //if (isFullscreen) {
         const fsElement = document.querySelector(
             ".video-player__overlay"
         );
@@ -108,7 +102,7 @@ function addNewChatMsg(node) {
 
     if (clone.className && clone.className.startsWith('chat-line')) {
         console.log("chat-line adding")
-        clone.className = 'chat-line__message__overlay';
+        clone.className = 'chat-line__message';
         if (chatArea.childElementCount > 100) chatArea.removeChild(chatArea.childNodes[chatArea.childElementCount - 1]);
         chatArea.prepend(clone)
     }
