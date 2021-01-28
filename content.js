@@ -16,7 +16,9 @@ chatHeader.appendChild(closeBtn);
 chatWrapper.appendChild(chatHeader);
 chatWrapper.appendChild(chatArea);
 
-let visibleChat = [];
+let chatObserver = null;
+let videoSrcObserver = null;
+
 let isFullscreen = false;
 
 /** Waits until chat DOM is built and calls init() after */
@@ -27,7 +29,7 @@ function waitForChat() {
             console.log('Could not find chat')
             clearInterval(int);
         }
-        chat = document.querySelector('.stream-chat .simplebar-scroll-content');
+        const chat = document.querySelector('.stream-chat .simplebar-scroll-content');
         if (chat) {
             clearInterval(int);
             init();
@@ -35,11 +37,11 @@ function waitForChat() {
     }, 500);
 }
 
+
 function init() {
     buildChatObserver();
 
-    let videoPlayer = document.querySelector('.video-player');
-    videoPlayer.addEventListener('fullscreenchange', changedFullscreen, false);
+    buildVideoSrcObserver();
 
     addChatFunctions();
 }
@@ -60,44 +62,46 @@ function changedFullscreen() {
 
 function buildChatObserver() {
     let chatNode = document.querySelector('.stream-chat .simplebar-scroll-content');
+    chatObserver = new MutationObserver(function (mutationsList, chatObserver) {
 
-    // Callback function to execute when mutations are observed
-    const callback = function (mutationsList, observer) {
-        // Use traditional 'for loops' for IE 11
         for (const mutation of mutationsList) {
             if (mutation.type === 'childList') {
-                addNewChatMsg(mutation);
+                mutation.addedNodes.forEach(node => addNewChatMsg(node));
             }
         }
-    };
-
-    // Create an observer instance linked to the callback function
-    const observer = new MutationObserver(callback);
-
-    // Start observing the target node for configured mutations
+    });
     const config = { attributes: true, childList: true, subtree: true };
-    observer.observe(chatNode, config);
-
-    // TODO stop observing at some point
-    //observer.disconnect();
+    chatObserver.observe(chatNode, config);
 }
 
-function addNewChatMsg(mutation) {
-    let newMessage = document.createElement('div');
+function buildVideoSrcObserver() {
+    let videoPlayer = document.querySelector('.video-player');
+    videoPlayer.addEventListener('fullscreenchange', changedFullscreen, false);
+    const video = videoPlayer.querySelector('video');
 
-    mutation.addedNodes.forEach(node => {
-        const clone = node.cloneNode(true);
-        if (clone.className === 'chat-line__message') newMessage.appendChild(clone);
-    })
+    videoSrcObserver = new MutationObserver(mutation => {
+        mutation.forEach(change => {
+            if (change.attributeName.includes('src')) {
+                // console.log(video.src);
+                visibleChat = [];
+                chatObserver.disconnect();
+                videoSrcObserver.disconnect();
+                waitForChat();
+            }
+        });
+    });
+    const config = { attributes: true };
+    videoSrcObserver.observe(video, config);
+}
 
-    if (visibleChat.length > 100) {
-        visibleChat.pop();
+function addNewChatMsg(node) {
+    const clone = node.cloneNode(true);
+    
+    if (clone.className && clone.className.startsWith('chat-line__message')) {
+        clone.className = 'chat-line__message';
+        if (chatArea.childElementCount > 100) chatArea.removeChild(chatArea.childNodes[chatArea.childElementCount-1]);
+        chatArea.prepend(clone)
     }
-    visibleChat.unshift(newMessage)
-
-    chatArea.innerHTML = '';
-    visibleChat.forEach(message => chatArea.appendChild(message));
-
 }
 
 function addChatFunctions() {
