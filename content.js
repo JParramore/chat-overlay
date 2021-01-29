@@ -16,6 +16,7 @@ chatHeader.appendChild(closeBtn);
 chatWrapper.appendChild(chatHeader);
 chatWrapper.appendChild(chatArea);
 
+let fsElement = null;
 let chatObserver = null;
 let videoSrcObserver = null;
 
@@ -43,14 +44,14 @@ function init() {
 }
 
 function changedFullscreen() {
-    if(document.fullscreenElement) {
-        const fsElement = document.querySelector(
+    if (document.fullscreenElement) {
+        fsElement = document.querySelector(
             ".video-player__overlay"
         );
         chatWrapper.style.display = 'flex';
         fsElement.appendChild(chatWrapper);
     } else {
-        chatWrapper.remove();
+        // chatWrapper.remove();
     };
 }
 
@@ -100,9 +101,44 @@ function addNewChatMsg(node) {
     if (clone.className && clone.className.startsWith('chat-line')) {
         console.log("chat-line adding")
         clone.className = 'chat-line__message';
-        if (chatArea.childElementCount > 100) chatArea.removeChild(chatArea.childNodes[chatArea.childElementCount - 1]);
-        chatArea.prepend(clone)
+
+        const msgLinks = node.getElementsByClassName('link-fragment');
+        console.log("node", node);
+        console.log(msgLinks);
+
+        msgLinks.forEach(link => {
+            console.log("clip", link);
+            if (link.host === 'clips.twitch.tv') {
+                console.log("in if clip")
+                handleTwitchClip();
+            }
+        })
     }
+
+    if (chatArea.childElementCount > 100) chatArea.removeChild(chatArea.childNodes[chatArea.childElementCount - 1]);
+    chatArea.prepend(clone);
+}
+
+
+function handleTwitchClip() {
+    console.log('twitch clip link');
+
+    let clipOverlay = document.createElement('div');
+    clipOverlay.className = 'clip-overlay';
+    let clipWrapper = document.createElement('div');
+    clipWrapper.className = 'clip-wrapper';
+    clipWrapper.appendChild(clipOverlay);
+
+    let clipFrame = document.createElement('iframe');
+    clipFrame.className = "clip-frame";
+    clipFrame.src = 'https://clips.twitch.tv/embed?clip=TangibleAmazingBisonDuDudu&parent=twitch.tv&autoplay=true';
+    clipFrame.width = "100%";
+    clipFrame.height = "100%";
+
+    clipWrapper.appendChild(clipFrame);
+    setDraggable(clipOverlay, clipWrapper);
+    let videoPlayer = document.querySelector('.video-player');
+    videoPlayer.appendChild(clipWrapper);
 }
 
 function addChatFunctions() {
@@ -120,15 +156,15 @@ function addChatFunctions() {
         chatWrapper.style.display = 'none';
     });
 
-    dragChat();
+    setDraggable(chatHeader, chatWrapper);
 }
 
 // Make chat draggable https://www.w3schools.com/howto/howto_js_draggable.asp
-function dragChat() {
+function setDraggable(draggable, container) {
 
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 
-    chatHeader.onmousedown = dragMouseDown;
+    draggable.onmousedown = dragMouseDown;
 
     function dragMouseDown(e) {
         e = e || window.event;
@@ -150,8 +186,8 @@ function dragChat() {
         pos3 = e.clientX;
         pos4 = e.clientY;
         // set the element's new position:
-        chatWrapper.style.top = (chatWrapper.offsetTop - pos2) + "px";
-        chatWrapper.style.left = (chatWrapper.offsetLeft - pos1) + "px";
+        container.style.top = (container.offsetTop - pos2) + "px";
+        container.style.left = (container.offsetLeft - pos1) + "px";
     }
 
     function closeDragElement() {
