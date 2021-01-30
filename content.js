@@ -1,9 +1,9 @@
 let chatWrapper = document.createElement('div');
-chatWrapper.className = 'chat-wrapper';
+chatWrapper.className = 'wrapper chat-wrapper';
 chatWrapper.style.display = 'flex';
 
 let chatHeader = document.createElement('div');
-chatHeader.className = 'chat-header';
+chatHeader.className = 'header chat-header';
 
 let closeBtn = document.createElement('button');
 closeBtn.className = 'close-button'
@@ -96,6 +96,8 @@ function buildVideoObserver() {
 }
 
 function addNewChatMsg(node) {
+
+
     const newChatLine = node.cloneNode(true);
 
     if (newChatLine.className && newChatLine.className.startsWith('chat-line')) {
@@ -104,49 +106,81 @@ function addNewChatMsg(node) {
 
         const msgLinks = node.getElementsByClassName('link-fragment');
         for (var i = 0; i < msgLinks.length; i++) {
-            if (msgLinks[i].host === 'clips.twitch.tv'){
-
-               
+            if (msgLinks[i].host === 'clips.twitch.tv') {
                 const slug = msgLinks[i].pathname.substring(1);
-
-                let cardLink = newChatLine.getElementsByClassName('chat-card')[0];
-                console.log("cl",cardLink);
-                if (cardLink){
-                    cardLink.onClick = () => console.log("clickedme"); // TODO FIX
-                }
+                let clipBtn = document.createElement('button');
+                clipBtn.className = 'clip-button';
+                clipBtn.innerHTML = 'play clip';
+                clipBtn.onclick = () => handleTwitchClip(slug);
+                newChatLine.style.display = 'flex';
+                newChatLine.appendChild(clipBtn);
+                break;
             }
         }
-        
-    
 
-    if (chatArea.childElementCount > 100) chatArea.removeChild(chatArea.childNodes[chatArea.childElementCount - 1]);
-    chatArea.prepend(newChatLine);
+        if (chatArea.childElementCount > 100) chatArea.removeChild(chatArea.childNodes[chatArea.childElementCount - 1]);
+        chatArea.prepend(newChatLine);
     }
 }
 
 
 function handleTwitchClip(slug) {
     console.log('twitch clip link');
+    let video = null;
+    let clipHeader = document.createElement('div');
+    clipHeader.className = 'header clip-header';
 
-    let clipOverlay = document.createElement('div');
-    clipOverlay.className = 'clip-overlay';
     let clipWrapper = document.createElement('div');
-    clipWrapper.className = 'clip-wrapper';
-    clipWrapper.appendChild(clipOverlay);
+    clipWrapper.className = 'wrapper clip-wrapper';
+
+    clipWrapper.onmouseover = () => {
+        clipHeader.style.display = 'flex';
+        clipWrapper.style.border = '2px solid grey';
+        clipWrapper.style.resize = 'auto';
+    }
+    clipWrapper.onmouseout = () => {
+        clipHeader.style.display = 'none';
+        clipWrapper.style.borderStyle = 'hidden';
+        clipWrapper.style.resize = 'none';
+    }
+
+    let closeVid = document.createElement('button');
+    closeVid.className = 'close-button'
+    closeVid.innerHTML = 'close';
+    closeVid.onclick = function() {
+        clipWrapper.remove();
+    };
+
+    clipHeader.appendChild(closeVid);
+
+    clipWrapper.appendChild(clipHeader);
 
     let clipFrame = document.createElement('iframe');
     clipFrame.className = "clip-frame";
     clipFrame.src = `https://clips.twitch.tv/embed?clip=${slug}&parent=twitch.tv&autoplay=true`;
     clipFrame.width = "100%";
     clipFrame.height = "100%";
+    clipFrame.onload = function () {
+        let videoOverlay = this.contentWindow.document.body.querySelector('.video-player__overlay');
+        videoOverlay.style.opacity = '0.5';
+
+        videoOverlay.querySelector('.top-bar').remove();
+        video = this.contentWindow.document.body.getElementsByTagName('video')[0];
+        video.onended = function () {
+            clipWrapper.remove();
+        }
+    }
 
     clipWrapper.appendChild(clipFrame);
-    setDraggable(clipOverlay, clipWrapper);
-    let videoPlayer = document.querySelector('.video-player');
-    videoPlayer.appendChild(clipWrapper);
+    setDraggable(clipHeader, clipWrapper);
+    fsElement.appendChild(clipWrapper);
 }
 
+
+
+
 function addChatFunctions() {
+
     chatWrapper.onmouseover = () => {
         chatHeader.style.display = 'flex';
         chatWrapper.style.border = '2px solid grey';
