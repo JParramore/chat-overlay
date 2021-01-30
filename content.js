@@ -1,6 +1,5 @@
 let chatWrapper = document.createElement('div');
 chatWrapper.className = 'wrapper chat-wrapper';
-chatWrapper.style.display = 'flex';
 
 let chatHeader = document.createElement('div');
 chatHeader.className = 'header chat-header';
@@ -16,6 +15,7 @@ chatHeader.appendChild(closeBtn);
 chatWrapper.appendChild(chatHeader);
 chatWrapper.appendChild(chatArea);
 
+let clipWrapper = null;
 let fsElement = null;
 let chatObserver = null;
 let videoSrcObserver = null;
@@ -51,7 +51,8 @@ function changedFullscreen() {
         chatWrapper.style.display = 'flex';
         fsElement.appendChild(chatWrapper);
     } else {
-        // chatWrapper.remove();
+        if(chatWrapper) chatWrapper.remove();
+        if(clipWrapper) clipWrapper.remove();
     };
 }
 
@@ -96,8 +97,6 @@ function buildVideoObserver() {
 }
 
 function addNewChatMsg(node) {
-
-
     const newChatLine = node.cloneNode(true);
 
     if (newChatLine.className && newChatLine.className.startsWith('chat-line')) {
@@ -129,8 +128,8 @@ function handleTwitchClip(slug) {
     let video = null;
     let clipHeader = document.createElement('div');
     clipHeader.className = 'header clip-header';
-
-    let clipWrapper = document.createElement('div');
+    
+    clipWrapper = document.createElement('div');
     clipWrapper.className = 'wrapper clip-wrapper';
 
     clipWrapper.onmouseover = () => {
@@ -176,11 +175,7 @@ function handleTwitchClip(slug) {
     fsElement.appendChild(clipWrapper);
 }
 
-
-
-
 function addChatFunctions() {
-
     chatWrapper.onmouseover = () => {
         chatHeader.style.display = 'flex';
         chatWrapper.style.border = '2px solid grey';
