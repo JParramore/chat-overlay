@@ -49,6 +49,13 @@
     right: 0;
     width: 100%;
     height: 100%;
-    
-    /* cursor: pointer; Add a pointer on hover */
 }
+
+/* .chat-line__message {
+    display: flex;
+} */
+/* 
+.clip-btn {
+    height: 30px;
+    width: 30px;
+} */

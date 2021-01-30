@@ -96,31 +96,36 @@ function buildVideoObserver() {
 }
 
 function addNewChatMsg(node) {
-    const clone = node.cloneNode(true);
+    const newChatLine = node.cloneNode(true);
 
-    if (clone.className && clone.className.startsWith('chat-line')) {
-        console.log("chat-line adding")
-        clone.className = 'chat-line__message';
+    if (newChatLine.className && newChatLine.className.startsWith('chat-line')) {
+        console.log("chat-line adding", newChatLine);
+        newChatLine.className = 'chat-line__message';
 
         const msgLinks = node.getElementsByClassName('link-fragment');
-        console.log("node", node);
-        console.log(msgLinks);
+        for (var i = 0; i < msgLinks.length; i++) {
+            if (msgLinks[i].host === 'clips.twitch.tv'){
 
-        msgLinks.forEach(link => {
-            console.log("clip", link);
-            if (link.host === 'clips.twitch.tv') {
-                console.log("in if clip")
-                handleTwitchClip();
+               
+                const slug = msgLinks[i].pathname.substring(1);
+
+                let cardLink = newChatLine.getElementsByClassName('chat-card')[0];
+                console.log("cl",cardLink);
+                if (cardLink){
+                    cardLink.onClick = () => console.log("clickedme"); // TODO FIX
+                }
             }
-        })
-    }
+        }
+        
+    
 
     if (chatArea.childElementCount > 100) chatArea.removeChild(chatArea.childNodes[chatArea.childElementCount - 1]);
-    chatArea.prepend(clone);
+    chatArea.prepend(newChatLine);
+    }
 }
 
 
-function handleTwitchClip() {
+function handleTwitchClip(slug) {
     console.log('twitch clip link');
 
     let clipOverlay = document.createElement('div');
@@ -131,7 +136,7 @@ function handleTwitchClip() {
 
     let clipFrame = document.createElement('iframe');
     clipFrame.className = "clip-frame";
-    clipFrame.src = 'https://clips.twitch.tv/embed?clip=TangibleAmazingBisonDuDudu&parent=twitch.tv&autoplay=true';
+    clipFrame.src = `https://clips.twitch.tv/embed?clip=${slug}&parent=twitch.tv&autoplay=true`;
     clipFrame.width = "100%";
     clipFrame.height = "100%";
 
