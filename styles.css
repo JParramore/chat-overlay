@@ -8,10 +8,10 @@
 }
 
 .chat-wrapper {
-    height: 400px;
-    width: 450px;
     min-width: 100px;
     min-height: 100px;
+    height: 500px;
+    width: 350px;
     display: flex;
     flex-direction: column;
     overflow: auto;
@@ -58,3 +58,8 @@
    padding-right: 10px;
 }
 
+.drag-box {
+    height: 30px;
+    width: 30px;
+    background-color: navy;
+}

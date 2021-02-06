@@ -1,0 +1,53 @@
+
+/* TOGGLEABLES */
+/* div[class$="_hide"] {
+    display: none !important;
+} */
+
+.channel-leaderboard_hide {
+    display: none !important;
+}
+
+.community-points-summary_hide {
+    display: none !important;
+}
+
+.stream-chat-header_hide {
+    display: none !important;
+}
+
+.community-highlight-stack__scroll-area--disable_hide {
+    display: none !important;
+}
+
+.community-highlight-stack__backlog-card_hide {
+    display: none !important;
+}
+
+/* .chat-input_hide {
+    display: none !important;
+} */
+
+/* GENERALS */
+
+body {
+    color: #FFFFFF!important;
+    margin: 0 auto!important;
+    overflow: hidden!important;
+}
+
+html, body,
+.room-selector, .room-selector__header,
+.twilight-minimal-root, .tw-root--theme-light,
+.popout-chat-page, .chat-room, .tw-c-background-alt,
+.chat-container, .ember-chat-container {
+    background: rgba(0,0,0,0.5)!important;
+    background-color: rgba(0,0,0,0.5)!important;
+}
+
+img.badge[alt="Twitch Prime"],
+img.badge[alt="Turbo"],
+img.badge[alt="Verified"]
+{
+    display: none!important;
+}

@@ -2,14 +2,34 @@
   "name": "chat overlay",
   "version": "1.0",
   "description": "Overlay chat of fullscreen video",
-  "permissions": ["activeTab", "declarativeContent", "storage"],
+  "permissions": [
+    "activeTab",
+    "declarativeContent",
+    "storage"
+  ],
   "content_scripts": [
     {
       "matches": [
         "https://www.twitch.tv/*"
       ],
-      "js": ["content.js"],
-      "css": ["styles.css"]
+      "js": [
+        "main.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
+    },
+    {
+      "matches": [
+        "https://www.twitch.tv/*/chat*"
+      ],
+      "js": [
+        "overlay.js"
+      ],
+      "css": [
+        "overlay.css"
+      ],
+      "all_frames": true
     }
   ],
   "manifest_version": 2
