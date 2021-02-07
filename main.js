@@ -1,52 +1,82 @@
-let chatWrapper = document.createElement('div');
-chatWrapper.className = 'wrapper chat-wrapper';
+let overlay = null
 
-let chatHeader = document.createElement('div');
-chatHeader.className = 'header chat-header';
-
-let alphaSlider = document.createElement('input');
-let alphaSliderContainer = document.createElement('div');
-alphaSlider.type = 'range';
-alphaSlider.min = '1';
-alphaSlider.max = '100';
-alphaSlider.value = '0';
-alphaSlider.className = 'alpha-slider';
-alphaSliderContainer.className = 'slider-container';
-alphaSliderContainer.appendChild(alphaSlider);
-
-let dragBox = document.createElement('div')
-dragBox.className = "drag-box"
-
-chatHeader.appendChild(alphaSliderContainer);
-chatHeader.appendChild(dragBox);
-
-let tglChat = document.createElement('button')
-tglChat.className = "toggle-chat"
-tglChat.innerHTML = "tglchat"
-
-chatWrapper.appendChild(chatHeader);
-
-let chatInput = null;
-let fsElement = null;
 /** Waits until chat DOM is built and calls init() after */
 function waitForVideo() {
-    const timeNow = Date.now();
+    const timeNow = Date.now()
     const int = setInterval(() => {
         if (Date.now() - timeNow > 10000) {
             console.log('Could not find video')
-            clearInterval(int);
+            clearInterval(int)
         }
         const video = document.querySelector('.video-player')
-        if (video) {
-            init();
-            clearInterval(int);
+        if (video && video.getAttribute('data-a-player-type') === 'site') {
+            console.log("found vid: ", video)
+            init()
+            clearInterval(int)
         }
-    }, 500);
+    }, 500)
 }
 
 
+// DOM content loaded
 function init() {
-    console.log("in init")
+    overlay = buildOverlay()
+    let toggleOverlayButton = buildToggleOverlayButton()
+
+    let videoPlayer = document.querySelector('.video-player')
+    videoPlayer.toggleOverlayButton = toggleOverlayButton
+    videoPlayer.overlay = overlay
+    observeChannelChange(videoPlayer)
+
+    videoPlayer.addEventListener('fullscreenchange', changedFullscreen, false)
+}
+
+
+// Fullscreen lister function
+function changedFullscreen() {
+    fsElement = document.querySelector(
+        ".video-player__overlay"
+    );
+    fsElement.appendChild(this.overlay)
+    if (document.fullscreenElement) {
+        this.toggleOverlayButton.style.display = 'flex'
+    } else {
+        this.toggleOverlayButton.style.display = 'none'
+        overlay.style.display = 'none'
+    }
+}
+
+
+// Build and insert toggle overlay
+function buildToggleOverlayButton() {
+    let tglWrapper = document.createElement('div')
+    tglWrapper.className = 'tgl-overlay-btn-wrapper tw-mg-l-05'
+
+    let toggleOverlayBtn = document.createElement('button')
+    toggleOverlayBtn.className = 'toggle-overlay-btn tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-core-button tw-core-button--primary tw-inline-flex tw-justify-content-center'
+    toggleOverlayBtn.onclick = function () {
+        !overlay.style.display || overlay.style.display == 'none' ? overlay.style.display = 'flex' : overlay.style.display = 'none'
+    }
+
+    let label = document.createElement('div')
+    label.className = 'tw-align-items-center tw-core-button-label tw-flex tw-flex-grow-0 tw-core-button-label-text'
+    label.innerHTML = 'Overlay'
+
+    toggleOverlayBtn.appendChild(label)
+    tglWrapper.appendChild(toggleOverlayBtn) // looping
+
+    let playerControls = document.querySelector('.player-controls__right-control-group')
+    playerControls.prepend(tglWrapper)
+
+    return tglWrapper
+}
+
+
+// Build overlay
+function buildOverlay() {
+    overlayWrapper = document.createElement('div')
+    overlayWrapper.className = 'wrapper overlay-wrapper'
+
     let video = document.querySelector('video')
     let url = new URL(video.baseURI)
     let slug = url.pathname
@@ -54,85 +84,59 @@ function init() {
     let chatFrame = document.createElement('iframe')
     chatFrame.className = 'chat-frame'
     chatFrame.src = `https://www.twitch.tv${slug}/chat`
-    chatFrame.height = "100%"
-    chatFrame.width = "100%"
-
+    chatFrame.height = '100%'
+    chatFrame.width = '100%'
     chatFrame.onload = function () {
         let frameBody = this.contentWindow.document.body;
-        displayNoneObserver(frameBody, 'channel-leaderboard')
-        displayNoneObserver(frameBody, 'community-points-summary')
-        displayNoneObserver(frameBody, 'stream-chat-header')
-        displayNoneObserver(frameBody, 'community-highlight-stack__scroll-area--disable', false)
-        displayNoneObserver(frameBody, 'community-highlight-stack__backlog-card', false)
-        displayNoneObserver(frameBody, 'chat-input')
-        chatInput = frameBody.querySelector('.chat-input')
-        addChatFunctions()
-        buildToggleButton()
-
+        let dragBox = buildDragElement()
+        addOverlayFunctions(overlayWrapper, dragBox, frameBody)
+        overlayWrapper.appendChild(dragBox)
     }
+    overlayWrapper.appendChild(chatFrame)
 
-    chatWrapper.appendChild(chatFrame)
-    chatWrapper.style.display = 'flex'; // remove
-    document.body.appendChild(chatWrapper); // todo remove for fs 
-
-}
-
-function buildToggleButton() {
-    let playerControls = document.querySelector('.player-controls__right-control-group')
-
-    playerControls.prepend(tglChat)
-}
-
-function displayNoneObserver(parent, className, stopLooking = true) {
-    let observer = new MutationObserver(function (mutationsList, observer) {
-
-        for (const mutation of mutationsList) {
-            if (mutation.type === 'childList') {
-                mutation.addedNodes.forEach(node => {
-                    let element = parent.querySelector(`.${className}`)
-                    if (element) {
-                        console.log("found class to hide: " + className, element)
-                        element.classList.add(`${className}_hide`)
-                        element.classList.remove('tw-flex')
-                        element.classList.remove('tw-block')
-                        if (stopLooking) observer.disconnect()
-                    }
-                })
-            }
-        }
-    });
-    const config = { attributes: true, childList: true, subtree: true };
-    observer.observe(parent, config);
+    return overlayWrapper
 }
 
 
+function buildDragElement() {
+    let dragWrapper = document.createElement('div')
+    dragWrapper.className = 'drag-wrapper tw-mg-l-05'
+    dragWrapper.style.visibility = 'hidden'
 
-function addChatFunctions() {
-    chatWrapper.onmouseover = () => {
-        chatHeader.style.display = 'flex';
-        chatWrapper.style.border = '2px solid grey';
-        chatWrapper.style.resize = 'auto';
-        chatInput.classList.remove('chat-input_hide');
-    }
-    chatWrapper.onmouseout = () => {
-        chatHeader.style.display = 'none';
-        chatWrapper.style.borderStyle = 'hidden';
-        chatWrapper.style.resize = 'none';
-        chatInput.classList.add('chat-input_hide');
-    }
-    
-    tglChat.onclick = function () {
-        chatWrapper.style.display == 'none' ? chatWrapper.style.display = 'flex' : chatWrapper.style.display = 'none'
-    };
+    let dragBtn = document.createElement('button')
+    dragBtn.className = 'drag-btn tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-core-button tw-core-button--primary tw-inline-flex tw-justify-content-center'
 
-    alphaSlider.oninput = function () {
-        console.log(this.value);
-    }
+    let label = document.createElement('div')
+    label.className = 'tw-align-items-center tw-core-button-label tw-flex tw-flex-grow-0 tw-core-button-label-text'
+    label.innerHTML = 'Move'
 
-    setDraggable(dragBox, chatWrapper);
+    dragBtn.appendChild(label)
+    dragWrapper.appendChild(dragBtn)
+    setDraggable(dragWrapper, overlay)
+
+    return dragWrapper
 }
 
-// Make chat draggable https://www.w3schools.com/howto/howto_js_draggable.asp
+
+function addOverlayFunctions(overlayWrapper, dragBox, frameBody) {
+    overlayWrapper.onmouseover = () => {
+        overlayWrapper.style.border = '2px solid rgb(145,71,255)'
+        overlayWrapper.style.resize = 'auto'
+        dragBox.style.visibility = 'visible'
+        let chatInput = frameBody.querySelector('.chat-input')
+        chatInput.classList.remove('chat-input_hide')
+
+    }
+    overlayWrapper.onmouseout = () => {
+        overlayWrapper.style.borderStyle = 'hidden'
+        overlayWrapper.style.resize = 'none'
+        dragBox.style.visibility = 'hidden'
+        let chatInput = frameBody.querySelector('.chat-input')
+        chatInput.classList.add('chat-input_hide')
+    }
+}
+
+
 function setDraggable(draggable, container) {
 
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -170,5 +174,22 @@ function setDraggable(draggable, container) {
     }
 }
 
-waitForVideo();
 
+// Load new overlay for new streamer
+function observeChannelChange(videoPlayer) {
+    observer = new MutationObserver(function (mutationsList, observer) {
+        for (const mutation of mutationsList) {
+            if (mutation.attributeName === 'src') {
+                console.log("src change")
+                observer.disconnect()
+                waitForVideo()
+            }
+        }
+
+    });
+    const config = { attributes: true, subtree: true };
+    observer.observe(videoPlayer, config);
+}
+
+
+waitForVideo()
