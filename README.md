@@ -17,9 +17,9 @@ Simple chrome extension for twitch that allows users to view twitch chat in full
 
 - Clone/download the repository locally
 - Navigate to [chrome://extensions/](chrome://extensions/) in your browser
-- `Load Unpacked` local repository
+- Click `Load Unpacked` and navigate to the cloned repository
 - Toggle the unpacked extension on
-- Open a twitch.tv stream in fullscreen
+- Open a [twitch.tv](https://www.twitch.tv/) stream in fullscreen
 
 ### How to use
  In fullscreen click the overlay buttom bottom right to toggle the overlay. Hover the overlay to change settings, move, and resize.
