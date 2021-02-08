@@ -1,4 +1,5 @@
 let overlay = null
+let frameBody = null
 
 /** Waits until chat DOM is built and calls init() after */
 function waitForVideo() {
@@ -25,8 +26,10 @@ function init() {
 
     let videoPlayer = document.querySelector('.video-player')
     videoPlayer.toggleOverlayButton = toggleOverlayButton
-    videoPlayer.overlay = overlay
     observeChannelChange(videoPlayer)
+
+    fsElement = document.querySelector('.video-player__overlay');
+    fsElement.appendChild(overlay)
 
     videoPlayer.addEventListener('fullscreenchange', changedFullscreen, false)
 }
@@ -34,10 +37,7 @@ function init() {
 
 // Fullscreen lister function
 function changedFullscreen() {
-    fsElement = document.querySelector(
-        ".video-player__overlay"
-    );
-    fsElement.appendChild(this.overlay)
+    
     if (document.fullscreenElement) {
         this.toggleOverlayButton.style.display = 'flex'
     } else {
@@ -55,7 +55,12 @@ function buildToggleOverlayButton() {
     let toggleOverlayBtn = document.createElement('button')
     toggleOverlayBtn.className = 'toggle-overlay-btn tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-core-button tw-core-button--primary tw-inline-flex tw-justify-content-center'
     toggleOverlayBtn.onclick = function () {
-        !overlay.style.display || overlay.style.display == 'none' ? overlay.style.display = 'flex' : overlay.style.display = 'none'
+        if (!overlay.style.display || overlay.style.display == 'none') {
+            overlay.style.display = 'flex'
+            flashChatAnimation()
+        } else {
+            overlay.style.display = 'none'
+        }
     }
 
     let label = document.createElement('div')
@@ -69,6 +74,36 @@ function buildToggleOverlayButton() {
     playerControls.prepend(tglWrapper)
 
     return tglWrapper
+}
+
+
+// Fade in transition to make it clear chat has been opened https://stackoverflow.com/a/11293378/14549357
+function flashChatAnimation() {
+    lerp = function (a, b, u) {
+        return (1 - u) * a + u * b
+    };
+
+    fade = function (element, property, start, end, duration) {
+        var interval = 10
+        var steps = duration / interval
+        var step_u = 1.0 / steps
+        var u = 0.0
+        var theInterval = setInterval(function () {
+            if (u >= 1.0) { clearInterval(theInterval) }
+            var r = parseInt(lerp(start.r, end.r, u))
+            var g = parseInt(lerp(start.g, end.g, u))
+            var b = parseInt(lerp(start.b, end.b, u))
+            var colorname = `rgba( ${r},${g},${b}, 0.25 )`
+            el.setAttribute('style', `${property}: ${colorname} !important`)
+            u += step_u;
+        }, interval);
+    };
+    if (!frameBody) return
+    el = frameBody.querySelector('.chat-room')
+    property = 'background-color'
+    startColor = { r: 145, g: 71, b: 255 }
+    endColor = { r: 31, g: 31, b: 35 }
+    fade(el, 'background-color', startColor, endColor, 1000)
 }
 
 
@@ -87,7 +122,7 @@ function buildOverlay() {
     chatFrame.height = '100%'
     chatFrame.width = '100%'
     chatFrame.onload = function () {
-        let frameBody = this.contentWindow.document.body;
+        frameBody = this.contentWindow.document.body;
         let dragBox = buildDragElement()
         addOverlayFunctions(overlayWrapper, dragBox, frameBody)
         overlayWrapper.appendChild(dragBox)
@@ -182,6 +217,8 @@ function observeChannelChange(videoPlayer) {
             if (mutation.attributeName === 'src') {
                 console.log("src change")
                 observer.disconnect()
+                if (overlay) overlay.remove()
+                if (frameBody) frameBody = null
                 waitForVideo()
             }
         }
