@@ -37,7 +37,6 @@ function init() {
 
 // Fullscreen lister function
 function changedFullscreen() {
-    
     if (document.fullscreenElement) {
         this.toggleOverlayButton.style.display = 'flex'
     } else {
@@ -138,14 +137,19 @@ function buildDragElement() {
     dragWrapper.className = 'drag-wrapper tw-mg-l-05'
     dragWrapper.style.visibility = 'hidden'
 
+    let stylesheet = document.createElement('link')
+    stylesheet.rel = 'stylesheet'
+    stylesheet.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'
+
     let dragBtn = document.createElement('button')
     dragBtn.className = 'drag-btn tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-core-button tw-core-button--primary tw-inline-flex tw-justify-content-center'
 
-    let label = document.createElement('div')
-    label.className = 'tw-align-items-center tw-core-button-label tw-flex tw-flex-grow-0 tw-core-button-label-text'
-    label.innerHTML = 'Move'
+    let label = document.createElement('i')
+    label.className = 'fa fa-arrows-alt tw-align-items-center tw-core-button-label tw-flex tw-flex-grow-0'
+
 
     dragBtn.appendChild(label)
+    dragWrapper.appendChild(stylesheet)
     dragWrapper.appendChild(dragBtn)
     setDraggable(dragWrapper, overlay)
 
@@ -173,7 +177,6 @@ function addOverlayFunctions(overlayWrapper, dragBox, frameBody) {
 
 
 function setDraggable(draggable, container) {
-
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 
     draggable.onmousedown = dragMouseDown;
