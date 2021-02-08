@@ -1,4 +1,5 @@
 let overlay = null
+let toggleOverlayButton = null
 let frameBody = null
 
 /** Waits until chat DOM is built and calls init() after */
@@ -22,11 +23,13 @@ function waitForVideo() {
 // DOM content loaded
 function init() {
     overlay = buildOverlay()
-    let toggleOverlayButton = buildToggleOverlayButton()
+    toggleOverlayButton = buildToggleOverlayButton()
 
     let videoPlayer = document.querySelector('.video-player')
-    videoPlayer.toggleOverlayButton = toggleOverlayButton
     observeChannelChange(videoPlayer)
+
+    let playerControls = document.querySelector('.player-controls__right-control-group')
+    playerControls.prepend(toggleOverlayButton)
 
     fsElement = document.querySelector('.video-player__overlay');
     fsElement.appendChild(overlay)
@@ -38,9 +41,9 @@ function init() {
 // Fullscreen lister function
 function changedFullscreen() {
     if (document.fullscreenElement) {
-        this.toggleOverlayButton.style.display = 'flex'
+        toggleOverlayButton.style.display = 'flex'
     } else {
-        this.toggleOverlayButton.style.display = 'none'
+        toggleOverlayButton.style.display = 'none'
         overlay.style.display = 'none'
     }
 }
@@ -49,10 +52,16 @@ function changedFullscreen() {
 // Build and insert toggle overlay
 function buildToggleOverlayButton() {
     let tglWrapper = document.createElement('div')
-    tglWrapper.className = 'tgl-overlay-btn-wrapper tw-mg-l-05'
+    tglWrapper.className = 'tgl-overlay-btn-wrapper tw-relative tw-tooltip__container'
+
+    let tooltip = document.createElement('div')
+    tooltip.className = 'tw-tooltip tw-tooltip--align-right tw-tooltip--up'
+    tooltip.role = 'tooltip'
+    tooltip.innerHTML = 'Toggle Overlay'
 
     let toggleOverlayBtn = document.createElement('button')
-    toggleOverlayBtn.className = 'toggle-overlay-btn tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-core-button tw-core-button--primary tw-inline-flex tw-justify-content-center'
+    toggleOverlayBtn.className = 'toggle-overlay-btn tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-button-icon tw-button-icon--overlay tw-core-button tw-core-button--overlay tw-justify-content-center'
+    toggleOverlayBtn.ariaLabel = 'Toggle Chat Overlay'
     toggleOverlayBtn.onclick = function () {
         if (!overlay.style.display || overlay.style.display == 'none') {
             overlay.style.display = 'flex'
@@ -62,15 +71,13 @@ function buildToggleOverlayButton() {
         }
     }
 
-    let label = document.createElement('div')
+    let label = document.createElement('span')
     label.className = 'tw-align-items-center tw-core-button-label tw-flex tw-flex-grow-0 tw-core-button-label-text'
     label.innerHTML = 'Overlay'
 
+    tglWrapper.appendChild(tooltip)
     toggleOverlayBtn.appendChild(label)
-    tglWrapper.appendChild(toggleOverlayBtn) // looping
-
-    let playerControls = document.querySelector('.player-controls__right-control-group')
-    playerControls.prepend(tglWrapper)
+    tglWrapper.appendChild(toggleOverlayBtn)
 
     return tglWrapper
 }
@@ -221,6 +228,7 @@ function observeChannelChange(videoPlayer) {
                 console.log("src change")
                 observer.disconnect()
                 if (overlay) overlay.remove()
+                if (toggleOverlayButton) toggleOverlayButton.remove()
                 if (frameBody) frameBody = null
                 waitForVideo()
             }
