@@ -20,7 +20,6 @@ function waitForVideo() {
 
 // DOM content loaded
 function init() {
-    console.log("ONCE")
     overlay = buildOverlay()
     toggleOverlayButton = buildToggleOverlayButton()
 
@@ -186,11 +185,16 @@ function addOverlayFunctions(overlayWrapper, dragBox, frameBody) {
 
 
 function setDraggable(draggable, container) {
-    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    let fsElement = document.querySelector('.video-player__overlay');
+    let videoPlayerHeight = null, videoPlayerWidth = null
 
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     draggable.onmousedown = dragMouseDown;
 
     function dragMouseDown(e) {
+        videoPlayerHeight = fsElement.offsetHeight
+        videoPlayerWidth = fsElement.offsetWidth
+
         e = e || window.event;
         e.preventDefault();
         // get the mouse cursor position at startup:
@@ -209,9 +213,26 @@ function setDraggable(draggable, container) {
         pos2 = pos4 - e.clientY;
         pos3 = e.clientX;
         pos4 = e.clientY;
+
         // set the element's new position:
-        container.style.top = (container.offsetTop - pos2) + "px";
-        container.style.left = (container.offsetLeft - pos1) + "px";
+        let offsetTop = container.offsetTop - pos2
+        let offsetLeft = container.offsetLeft - pos1
+        container.style.top = offsetTop + "px";
+        container.style.left = offsetLeft + "px";
+
+        if (container.offsetTop < 0) {
+            container.style.top = '0px'
+        }
+        if (container.offsetLeft < 0){
+            container.style.left = '0px'
+        }
+        if (container.offsetTop + container.offsetHeight > videoPlayerHeight) {
+            container.style.top = `${videoPlayerHeight - container.offsetHeight}px`
+        }
+        if (container.offsetLeft + container.offsetWidth > videoPlayerWidth) {
+            container.style.left = `${videoPlayerWidth - container.offsetWidth}px`
+        }
+
     }
 
     function closeDragElement() {
