@@ -129,16 +129,18 @@ function updateSettings() {
     let messageContainer = document.querySelector('.chat-scrollable-area__message-container')
     let chatRoom = document.querySelector('.chat-room')
     let messageArea = document.querySelector('.chat-scrollable-area__message-container')
+    let chatList = chatRoom.querySelector('.chat-list--other')
+    let scrollBar = chatList.querySelector('.simplebar-scrollbar')
 
     let { red, green, blue, alpha } = settings.background
     let { fontSize, opacity } = settings.chat
 
     messageContainer.style.fontSize = `${fontSize}px`
     messageArea.style.opacity = opacity
-    chatRoom.setAttribute('style', `background-color: rgba(${red},${green},${blue},${alpha}) !important`)
+    scrollBar.style.opacity = alpha
+    chatRoom.setAttribute('style', `background-color: rgba(${red},${green},${blue},${alpha}) !important;`)
 
     document.body.settings = settings
-    console.dir(document)
 }
 
 
