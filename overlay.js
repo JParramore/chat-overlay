@@ -7,16 +7,28 @@ const TO_HIDE = [
     'chat-input'
 ]
 
+let settings = {
+    background: {
+        red: 31,
+        green: 31,
+        blue: 35,
+        alpha: 0.25,
+    },
+    chat: {
+        fontSize: 14,
+        opacity: 1.0
+    }
+}
+
+
 function waitForChat() {
     const timeNow = Date.now();
     const int = setInterval(() => {
         if (Date.now() - timeNow > 10000) {
-            console.log('Could not find video')
             clearInterval(int);
         }
         const chat = document.querySelector('.chat-scrollable-area__message-container')
         if (chat) {
-            console.log("chat connected")
             init();
             clearInterval(int);
         }
@@ -24,6 +36,7 @@ function waitForChat() {
 }
 
 function init() {
+    document.body.settings = settings
     TO_HIDE.forEach(className => displayNoneObserver(document.body, className))
     insertOverlaySettings()
 }
@@ -53,65 +66,100 @@ function insertOverlaySettings() {
 }
 
 
-// TODO FIX
-function buildDarkthemeToggle() { 
-    let chatRoom = document.querySelector('.chat-room')
-
+// Build the toggle dark mode setting
+function buildDarkthemeToggle() {
     let tglContainer = document.createElement('div')
     tglContainer.className = 'setting-container'
 
-    let label = document.createElement('div')
-    label.className = 'setting-label'
-    label.innerHTML = 'Dark/Light'
+    let twToggle = document.createElement('div')
+    twToggle.className = 'tw-toggle'
 
-    let tag = document.createElement('label')
-    tag.className = 'toggle-button'
+    let text = document.createElement('div')
+    text.className = 'setting-label'
+    text.innerHTML = 'Dark Mode'
 
     let input = document.createElement('input')
     input.type = 'checkbox'
-    input.onchange = function() {
+    input.checked = true
+    input.className = 'tw-toggle__input'
+    input.id = 'overlay-chat-settings-dark-mode'
+    input.setAttribute('data-a-target', 'tw-toggle')
+    input.onchange = function () {
         if (this.checked) {
-            console.log(chatRoom.style.backgroundColor)
-            chatRoom.setAttribute('style', `background-color: rgb(31,31,35) !important`)
-            document.body.style.color = "#FFFFFF !important"
+            toggleThemeDark(true)
+            let a = settings.background.alpha
+            settings.background = { red: 31, green: 31, blue: 35, alpha: a }
+            updateSettings()
         } else {
-            console.log(chatRoom.style.backgroundColor)
-            chatRoom.setAttribute('style', `background-color: rgb(255,255,255) !important`)
-            document.body.style.color = "rgb(31,31,35) !important"
+            toggleThemeDark(false)
+            let a = settings.background.alpha
+            settings.background = { red: 255, green: 255, blue: 255, alpha: a }
+            updateSettings()
         }
     }
 
-    let span = document.createElement('span')
-    span.className = 'toggle-slider'
+    let label = document.createElement('label')
+    label.className = 'tw-toggle__button'
+    label.setAttribute('for', 'overlay-chat-settings-dark-mode')
 
-    tag.appendChild(input)
-    tag.appendChild(span)
-    tglContainer.appendChild(label)
-    tglContainer.appendChild(tag)
+    twToggle.appendChild(input)
+    twToggle.appendChild(label)
+
+    tglContainer.appendChild(text)
+    tglContainer.appendChild(twToggle)
 
     return tglContainer
 }
 
 
+// Toggle dark theme on/off
+function toggleThemeDark(darkMode) {
+    if (darkMode) {
+        document.documentElement.classList.remove('tw-root--theme-light')
+        document.documentElement.classList.add('tw-root--theme-dark')
+    } else {
+        document.documentElement.classList.remove('tw-root--theme-dark')
+        document.documentElement.classList.add('tw-root--theme-light')
+    }
+}
+
+
+// Update overlay styles with settings
+function updateSettings() {
+    let messageContainer = document.querySelector('.chat-scrollable-area__message-container')
+    let chatRoom = document.querySelector('.chat-room')
+    let messageArea = document.querySelector('.chat-scrollable-area__message-container')
+
+    let { red, green, blue, alpha } = settings.background
+    let { fontSize, opacity } = settings.chat
+
+    messageContainer.style.fontSize = `${fontSize}px`
+    messageArea.style.opacity = opacity
+    chatRoom.setAttribute('style', `background-color: rgba(${red},${green},${blue},${alpha}) !important`)
+
+    document.body.settings = settings
+    console.dir(document)
+}
+
+
 // Build font slider setting
 function buildFontSlider() {
-    let messageContainer = document.querySelector('.chat-scrollable-area__message-container')
-
     let fontSliderContainer = document.createElement('div')
     fontSliderContainer.className = 'setting-container'
 
     let label = document.createElement('div')
     label.className = 'setting-label'
-    label.innerHTML = 'Font'
+    label.innerHTML = 'Font Size'
 
     let fontSlider = document.createElement('input')
     fontSlider.type = 'range'
     fontSlider.min = '8'
     fontSlider.max = '30'
-    fontSlider.value = '12'
+    fontSlider.value = '14'
     fontSlider.className = 'font-slider slider'
     fontSlider.oninput = function () {
-        messageContainer.style.fontSize = `${this.value}px`
+        settings.chat.fontSize = this.value
+        updateSettings()
     }
 
     fontSliderContainer.appendChild(label)
@@ -123,14 +171,12 @@ function buildFontSlider() {
 
 // Build alpha slider setting
 function buildAlphaSlider() {
-    let chatRoom = document.querySelector('.chat-room')
-
     let alphaSliderContainer = document.createElement('div')
     alphaSliderContainer.className = 'setting-container'
 
     let label = document.createElement('div')
     label.className = 'setting-label'
-    label.innerHTML = 'Alpha'
+    label.innerHTML = 'BG Opacity'
 
     let alphaSlider = document.createElement('input')
     alphaSlider.type = 'range'
@@ -139,7 +185,8 @@ function buildAlphaSlider() {
     alphaSlider.value = '25'
     alphaSlider.className = 'alpha-slider slider'
     alphaSlider.oninput = function () {
-        chatRoom.setAttribute('style', `background-color: rgba(31,31,35,${this.value / 100}) !important`)
+        settings.background.alpha = (this.value / 100)
+        updateSettings()
     }
 
     alphaSliderContainer.appendChild(label)
@@ -151,14 +198,12 @@ function buildAlphaSlider() {
 
 // Build opacity slider setting
 function buildOpacitySlider() {
-    let messageArea = document.querySelector('.chat-scrollable-area__message-container')
-
     let opacitySliderContainer = document.createElement('div')
     opacitySliderContainer.className = 'setting-container'
 
     let label = document.createElement('div')
     label.className = 'setting-label'
-    label.innerHTML = 'Opacity'
+    label.innerHTML = 'Chat Opacity'
 
     let opacitySlider = document.createElement('input')
     opacitySlider.type = 'range'
@@ -167,7 +212,8 @@ function buildOpacitySlider() {
     opacitySlider.value = '25'
     opacitySlider.className = 'opacity-slider slider'
     opacitySlider.oninput = function () {
-        messageArea.style.opacity = this.value / 100
+        settings.chat.opacity = this.value / 100
+        updateSettings()
     }
 
     opacitySliderContainer.appendChild(label)
@@ -186,12 +232,10 @@ function displayNoneObserver(parent, className, stopLooking = true) {
                 mutation.addedNodes.forEach(node => {
                     let element = parent.querySelector(`.${className}`)
                     if (element) {
-                        // console.log("found class to hide: " + className, element)
                         element.classList.add(`${className}_hide`)
                         element.classList.remove('tw-flex')
                         element.classList.remove('tw-block')
                         observer.disconnect()
-                        // if (stopLooking) observer.disconnect() // necessary?
                     }
                 })
             }

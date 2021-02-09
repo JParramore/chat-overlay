@@ -7,12 +7,10 @@ function waitForVideo() {
     const timeNow = Date.now()
     const int = setInterval(() => {
         if (Date.now() - timeNow > 10000) {
-            console.log('Could not find video')
             clearInterval(int)
         }
         const video = document.querySelector('.video-player')
         if (video && video.getAttribute('data-a-player-type') === 'site') {
-            console.log("found vid: ", video)
             init()
             clearInterval(int)
         }
@@ -22,6 +20,7 @@ function waitForVideo() {
 
 // DOM content loaded
 function init() {
+    console.log("ONCE")
     overlay = buildOverlay()
     toggleOverlayButton = buildToggleOverlayButton()
 
@@ -65,7 +64,7 @@ function buildToggleOverlayButton() {
     toggleOverlayBtn.onclick = function () {
         if (!overlay.style.display || overlay.style.display == 'none') {
             overlay.style.display = 'flex'
-            flashChatAnimation()
+            flashChatAnimation(frameBody.settings.background)
         } else {
             overlay.style.display = 'none'
         }
@@ -80,36 +79,6 @@ function buildToggleOverlayButton() {
     tglWrapper.appendChild(toggleOverlayBtn)
 
     return tglWrapper
-}
-
-
-// Fade in transition to make it clear chat has been opened https://stackoverflow.com/a/11293378/14549357
-function flashChatAnimation() {
-    lerp = function (a, b, u) {
-        return (1 - u) * a + u * b
-    };
-
-    fade = function (element, property, start, end, duration) {
-        var interval = 10
-        var steps = duration / interval
-        var step_u = 1.0 / steps
-        var u = 0.0
-        var theInterval = setInterval(function () {
-            if (u >= 1.0) { clearInterval(theInterval) }
-            var r = parseInt(lerp(start.r, end.r, u))
-            var g = parseInt(lerp(start.g, end.g, u))
-            var b = parseInt(lerp(start.b, end.b, u))
-            var colorname = `rgba( ${r},${g},${b}, 0.25 )`
-            el.setAttribute('style', `${property}: ${colorname} !important`)
-            u += step_u;
-        }, interval);
-    };
-    if (!frameBody) return
-    el = frameBody.querySelector('.chat-room')
-    property = 'background-color'
-    startColor = { r: 145, g: 71, b: 255 }
-    endColor = { r: 31, g: 31, b: 35 }
-    fade(el, 'background-color', startColor, endColor, 1000)
 }
 
 
@@ -137,6 +106,39 @@ function buildOverlay() {
 
     return overlayWrapper
 }
+
+
+// Fade in transition to make it clear chat has been opened https://stackoverflow.com/a/11293378/14549357
+function flashChatAnimation(backgroundSettings) {
+    lerp = function (a, b, u) {
+        return (1 - u) * a + u * b
+    };
+
+    fade = function (element, property, start, end, duration) {
+        var interval = 10
+        var steps = duration / interval
+        var step_u = 1.0 / steps
+        var u = 0.0
+        var theInterval = setInterval(function () {
+            if (u >= 1.0) { clearInterval(theInterval) }
+            var r = parseInt(lerp(start.r, end.r, u))
+            var g = parseInt(lerp(start.g, end.g, u))
+            var b = parseInt(lerp(start.b, end.b, u))
+            var a = parseInt(lerp(start.a, end.a, u))
+            var colorname = `rgba( ${r},${g},${b},${a / 100.0} )`
+            el.setAttribute('style', `${property}: ${colorname} !important`)
+            u += step_u;
+        }, interval);
+    };
+
+    el = frameBody.querySelector('.chat-room')
+    property = 'background-color'
+    let { red, green, blue, alpha } = backgroundSettings
+    startColor = { r: 145, g: 71, b: 255, a: 100 }
+    endColor = { r: red, g: green, b: blue, a: (alpha * 100.0) }
+    fade(el, 'background-color', startColor, endColor, 1000)
+}
+
 
 
 function buildDragElement() {
@@ -225,7 +227,6 @@ function observeChannelChange(videoPlayer) {
     observer = new MutationObserver(function (mutationsList, observer) {
         for (const mutation of mutationsList) {
             if (mutation.attributeName === 'src') {
-                console.log("src change")
                 observer.disconnect()
                 if (overlay) overlay.remove()
                 if (toggleOverlayButton) toggleOverlayButton.remove()

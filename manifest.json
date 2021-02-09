@@ -12,6 +12,9 @@
       "matches": [
         "https://www.twitch.tv/*"
       ],
+      "exclude_matches": [
+        "*://*/*/*chat*"
+      ],
       "js": [
         "main.js"
       ],
