@@ -47,28 +47,13 @@ function insertOverlaySettings() {
     let chatSettingsBar = document.querySelector('.chat-input__buttons-container')
 
     let overlaySettingsContainer = document.createElement('div')
-    overlaySettingsContainer.className = "overlay-settings-container"
+    overlaySettingsContainer.className = 'overlay-settings-container'
 
-    let subSettingsContainerOne = document.createElement('div')
-    let subSettingsContainerTwo = document.createElement('div')
-    subSettingsContainerOne.className = 'settings-sub-container'
-    subSettingsContainerTwo.className = 'settings-sub-container'
-
-    subSettingsContainerOne.appendChild(buildAlphaSlider())
-    subSettingsContainerOne.appendChild(buildOpacitySlider())
-
-    subSettingsContainerTwo.appendChild(buildFontSlider())
-
-    let subsubSettingsContainer = document.createElement('div')
-    subsubSettingsContainer.className = 'settings-sub-container'
-
-    subsubSettingsContainer.appendChild(buildBoldChatToggle())
-    subsubSettingsContainer.appendChild(buildDarkthemeToggle())
-
-    subSettingsContainerTwo.appendChild(subsubSettingsContainer)
-
-    overlaySettingsContainer.appendChild(subSettingsContainerOne)
-    overlaySettingsContainer.appendChild(subSettingsContainerTwo)
+    overlaySettingsContainer.appendChild(buildAlphaSlider())
+    overlaySettingsContainer.appendChild(buildDarkthemeToggle())
+    overlaySettingsContainer.appendChild(buildOpacitySlider())
+    overlaySettingsContainer.appendChild(buildBoldChatToggle())
+    overlaySettingsContainer.appendChild(buildFontSlider())
 
     chatSettingsBar.prepend(overlaySettingsContainer)
 }
@@ -261,7 +246,7 @@ function buildOpacitySlider() {
     opacitySlider.type = 'range'
     opacitySlider.min = '1'
     opacitySlider.max = '100'
-    opacitySlider.value = '25'
+    opacitySlider.value = '100'
     opacitySlider.className = 'opacity-slider slider'
     opacitySlider.oninput = function () {
         settings.chat.opacity = this.value / 100

@@ -46,15 +46,12 @@ html, body {
     flex-direction: row;
 }
 
-.settings-sub-container {
-    padding-right: 10px;
-}
-
 .setting-container {
     display: flex;
     width: 175px;
     align-items: center;
     justify-content: space-between;
+    padding-right: 10px;
 }
 
 .slider {
