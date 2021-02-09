@@ -16,7 +16,8 @@ let settings = {
     },
     chat: {
         fontSize: 14,
-        opacity: 1.0
+        bold: false,
+        opacity: 1.0,
     }
 }
 
@@ -57,7 +58,14 @@ function insertOverlaySettings() {
     subSettingsContainerOne.appendChild(buildOpacitySlider())
 
     subSettingsContainerTwo.appendChild(buildFontSlider())
-    subSettingsContainerTwo.appendChild(buildDarkthemeToggle())
+
+    let subsubSettingsContainer = document.createElement('div')
+    subsubSettingsContainer.className = 'settings-sub-container'
+
+    subsubSettingsContainer.appendChild(buildBoldChatToggle())
+    subsubSettingsContainer.appendChild(buildDarkthemeToggle())
+
+    subSettingsContainerTwo.appendChild(subsubSettingsContainer)
 
     overlaySettingsContainer.appendChild(subSettingsContainerOne)
     overlaySettingsContainer.appendChild(subSettingsContainerTwo)
@@ -112,6 +120,47 @@ function buildDarkthemeToggle() {
 }
 
 
+function buildBoldChatToggle() {
+    let tglContainer = document.createElement('div')
+    tglContainer.className = 'setting-container'
+
+    let twToggle = document.createElement('div')
+    twToggle.className = 'tw-toggle'
+
+    let text = document.createElement('div')
+    text.className = 'setting-label'
+    text.innerHTML = 'Chunky Chat'
+
+    let input = document.createElement('input')
+    input.type = 'checkbox'
+    input.checked = false
+    input.className = 'tw-toggle__input'
+    input.id = 'overlay-chat-settings-embolden'
+    input.setAttribute('data-a-target', 'tw-toggle')
+    input.onchange = function () {
+        if (this.checked) {
+            settings.chat.bold = true
+            updateSettings()
+        } else {
+            settings.chat.bold = false
+            updateSettings()
+        }
+    }
+
+    let label = document.createElement('label')
+    label.className = 'tw-toggle__button'
+    label.setAttribute('for', 'overlay-chat-settings-embolden')
+
+    twToggle.appendChild(input)
+    twToggle.appendChild(label)
+
+    tglContainer.appendChild(text)
+    tglContainer.appendChild(twToggle)
+
+    return tglContainer
+}
+
+
 // Toggle dark theme on/off
 function toggleThemeDark(darkMode) {
     if (darkMode) {
@@ -133,9 +182,10 @@ function updateSettings() {
     let scrollBar = chatList.querySelector('.simplebar-scrollbar')
 
     let { red, green, blue, alpha } = settings.background
-    let { fontSize, opacity } = settings.chat
+    let { fontSize, bold, opacity } = settings.chat
 
     messageContainer.style.fontSize = `${fontSize}px`
+    messageContainer.style.fontWeight = bold ? 'bold' : 'normal'
     messageArea.style.opacity = opacity
     scrollBar.style.opacity = alpha
     chatRoom.setAttribute('style', `background-color: rgba(${red},${green},${blue},${alpha}) !important;`)
