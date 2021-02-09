@@ -25,6 +25,7 @@
     display: none !important;
 }
 
+
 /* OTHERS */
 
 html, body {
@@ -54,22 +55,27 @@ html, body {
     padding-right: 10px;
 }
 
+.setting-label {
+    font-weight: bold;
+}
+
 .slider {
     width: 75px;
 }
 
 input[type="range"] {
-    height: 10px;
-    background: rgb(145,71,255);
-    border-radius: 5px;
+    height: 1em;
+    background: rgb(31, 31, 35);
+    border: 1px solid rgb(145,71,255);
+    border-radius: 0.5em;
     -webkit-appearance: none !important;
 }
 
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none !important;
     background: rgb(255, 255, 255);
-    height: 10px;
-    width: 10px;
+    height: 0.6em;
+    width: 0.6em;
     cursor: pointer;
     border-radius: 100%;
 }
