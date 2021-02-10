@@ -335,7 +335,7 @@ function displayNoneObserver(parent, query, stopLooking = true) {
                         element.classList.remove('tw-flex')
                         element.classList.remove('tw-block')
                         element.classList.remove('tw-inline-flex')
-                        observer.disconnect()
+                        if (stopLooking) observer.disconnect()
                     }
                 })
             }

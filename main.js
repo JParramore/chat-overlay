@@ -151,6 +151,7 @@ function buildDragElement() {
 
     let dragBtn = document.createElement('button')
     dragBtn.className = 'drag-btn tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-core-button tw-core-button--primary tw-inline-flex tw-justify-content-center'
+    dragBtn.style.cursor = 'move'
 
     let label = document.createElement('i')
     label.className = 'fa fa-arrows-alt tw-align-items-center tw-core-button-label tw-flex tw-flex-grow-0'
