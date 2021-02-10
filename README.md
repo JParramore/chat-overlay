@@ -27,9 +27,8 @@ Movable, resizable, transparent chat box overlay:
 - Toggle Developer Mode
 - Click `Load Unpacked` and navigate to the cloned repository
 - Toggle the unpacked extension on
-- Open a [twitch.tv](https://www.twitch.tv/) stream and click the purple overlay icon bottom right of the video player
 
 ![Overlay Toggle Icon](https://i.imgur.com/CXFmi92.png)
 
 ### How to use
- In fullscreen click the overlay buttom bottom right to toggle the overlay. Hover the overlay to change settings, move, and resize.
+ Open a [twitch.tv](https://www.twitch.tv/) stream and click the purple overlay icon bottom right of the video player. Hover the overlay to change settings, move, and resize.
