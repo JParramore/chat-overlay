@@ -51,7 +51,7 @@ function buildToggleOverlayButton() {
     toggleOverlayBtn.onclick = function () {
         if (!overlay.style.display || overlay.style.display == 'none') {
             overlay.style.display = 'flex'
-            flashChatAnimation(frameBody.settings.background) // TODO: null when too fast
+            flashChatAnimation()
         } else {
             overlay.style.display = 'none'
         }
@@ -108,7 +108,7 @@ function buildOverlay() {
 
 
 // Fade in transition to make it clear chat has been opened https://stackoverflow.com/a/11293378/14549357
-function flashChatAnimation(backgroundSettings) {
+function flashChatAnimation() {
     lerp = function (a, b, u) {
         return (1 - u) * a + u * b
     }
@@ -132,7 +132,7 @@ function flashChatAnimation(backgroundSettings) {
 
     el = frameBody.querySelector('.chat-room')
     property = 'background-color'
-    let { red, green, blue, alpha } = backgroundSettings
+    let { red, green, blue, alpha } = frameBody.settings.background
     startColor = { r: 145, g: 71, b: 255, a: 100 }
     endColor = { r: red, g: green, b: blue, a: (alpha * 100.0) }
     fade(el, 'background-color', startColor, endColor, 1000)

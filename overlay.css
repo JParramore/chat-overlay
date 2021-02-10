@@ -44,6 +44,10 @@ html, body {
     overflow: hidden!important;
 }
 
+.bttv-split-chat-alt-bg, .tw-c-background-alt {
+    background-color: rgba(31, 31, 35, 0) !important;
+}
+
 .chat-room {
     background-color: rgba(31, 31, 35, 0.25) !important;
 }

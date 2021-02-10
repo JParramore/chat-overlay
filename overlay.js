@@ -230,7 +230,7 @@ function updateSettings() {
     let { red, green, blue, alpha } = settings.background
     let { fontSize, bold, opacity } = settings.chat
 
-    messageContainer.style.fontSize = `${fontSize}px`
+    messageContainer.setAttribute('style',`font-size: ${fontSize}px !important`)
     messageContainer.style.fontWeight = bold ? 'bold' : 'normal'
     messageArea.style.opacity = opacity
     scrollBar.style.opacity = alpha

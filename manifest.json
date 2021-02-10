@@ -1,5 +1,5 @@
 {
-  "name": "chat overlay",
+  "name": "Twitch Chat Overlay",
   "version": "1.0",
   "description": "Overlay chat of fullscreen video",
   "permissions": [
