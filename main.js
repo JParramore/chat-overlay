@@ -203,6 +203,7 @@ function setDraggable(draggable, container) {
         pos3 = e.clientX;
         pos4 = e.clientY;
         document.onmouseup = closeDragElement;
+        frameBody.onmouseup = closeDragElement;
         // call a function whenever the cursor moves:
         document.onmousemove = elementDrag;
     }
@@ -239,6 +240,8 @@ function setDraggable(draggable, container) {
     function closeDragElement() {
         // stop moving when mouse button is released:
         document.onmouseup = null;
+        frameBody.onmouseup = null;
+
         document.onmousemove = null;
     }
 }
