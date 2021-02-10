@@ -29,6 +29,9 @@
     display: none !important;
 }
 
+.simplebar-content {
+    padding-bottom: 0px !important;
+}
 
 /* OTHERS */
 
@@ -46,6 +49,7 @@ html, body {
 
 .settings-wrapper {
     position: relative;
+    width: 250px;
 }
 
 .chat-input-container {
@@ -66,30 +70,29 @@ html, body {
 .setting-container {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-weight: bold;
 }
 
 .settings-btn-container {
     z-index: 2147483647;
     position: absolute;
-    top: -20px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+    top: -35px;
 }
 
 input[type="range"] {
-    height: 1em;
+    height: 1.6rem;
     background: rgb(31, 31, 35);
-    border: 1px solid rgb(145,71,255);
-    border-radius: 0.5em;
+    border-radius: 8px;
+    border: 2px solid rgb(145,71,255);
     -webkit-appearance: none !important;
 }
 
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none !important;
-    background: rgb(255, 255, 255);
-    height: 0.6em;
-    width: 0.6em;
+    background: rgb(255,255,255);
+    height: 0.8rem;
+    width: 0.8rem;
     cursor: pointer;
     border-radius: 100%;
 }

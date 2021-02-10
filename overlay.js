@@ -90,7 +90,7 @@ function buildOverlaySettings() {
     stylesheet.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'
 
     let settingsButton = document.createElement('button')
-    settingsButton.className = 'settings-button tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-button-icon tw-core-button tw-inline-flex tw-justify-content-center tw-overflow-hidden tw-relative'
+    settingsButton.className = 'settings-button tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-core-button tw-core-button--primary tw-inline-flex tw-justify-content-center'
     settingsButton.setAttribute('aria-label', 'Overlay Settings')
     settingsButton.onclick = toggleShowSettings
 
@@ -226,7 +226,6 @@ function updateSettings() {
     let chatList = chatRoom.querySelector('.chat-list--other')
     let scrollBar = chatList.querySelector('.simplebar-scrollbar')
     let overlaySettingsContainer = chatRoom.querySelector('.overlay-settings-container')
-    let settingsButtonContainer = overlaySettingsContainer.querySelector('.settings-btn-container')
 
     let { red, green, blue, alpha } = settings.background
     let { fontSize, bold, opacity } = settings.chat
@@ -236,9 +235,7 @@ function updateSettings() {
     messageArea.style.opacity = opacity
     scrollBar.style.opacity = alpha
     chatRoom.setAttribute('style', `background-color: rgba(${red},${green},${blue},${alpha}) !important;`)
-
     overlaySettingsContainer.style.backgroundColor = `rgb(${red},${green},${blue})`
-    settingsButtonContainer.setAttribute('style', `background-color: rgba(${red},${green},${blue},1) !important;`)
    
     document.body.settings = settings
 }
