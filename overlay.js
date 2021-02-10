@@ -25,17 +25,17 @@ let settings = {
 
 
 function waitForChat() {
-    const timeNow = Date.now();
+    const timeNow = Date.now()
     const int = setInterval(() => {
         if (Date.now() - timeNow > 10000) {
-            clearInterval(int);
+            clearInterval(int)
         }
         const chat = document.querySelector('.chat-scrollable-area__message-container')
         if (chat) {
-            init();
-            clearInterval(int);
+            init()
+            clearInterval(int)
         }
-    }, 500);
+    }, 500)
 }
 
 function init() {
@@ -340,9 +340,9 @@ function displayNoneObserver(parent, query, stopLooking = true) {
                 })
             }
         }
-    });
-    const config = { attributes: true, childList: true, subtree: true };
-    observer.observe(parent, config);
+    })
+    const config = { attributes: true, childList: true, subtree: true }
+    observer.observe(parent, config)
 }
 
 

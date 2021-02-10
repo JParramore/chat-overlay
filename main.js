@@ -10,7 +10,6 @@ function waitForVideo() {
             clearInterval(int)
         }
         const video = document.querySelector('.video-player')
-        console.log(video)
         if (video && video.getAttribute('data-a-player-type') === 'site') {
             init()
             clearInterval(int)
@@ -30,7 +29,7 @@ function init() {
     let playerControls = document.querySelector('.player-controls__right-control-group')
     playerControls.prepend(toggleOverlayButton)
 
-    fsElement = document.querySelector('.video-player__overlay');
+    fsElement = document.querySelector('.video-player__overlay')
     fsElement.appendChild(overlay)
 }
 
@@ -96,7 +95,7 @@ function buildOverlay() {
     chatFrame.height = '100%'
     chatFrame.width = '100%'
     chatFrame.onload = function () {
-        frameBody = this.contentWindow.document.body;
+        frameBody = this.contentWindow.document.body
         let dragBox = buildDragElement()
         addOverlayFunctions(overlayWrapper, dragBox, frameBody)
         overlayWrapper.appendChild(dragBox)
@@ -111,7 +110,7 @@ function buildOverlay() {
 function flashChatAnimation(backgroundSettings) {
     lerp = function (a, b, u) {
         return (1 - u) * a + u * b
-    };
+    }
 
     fade = function (element, property, start, end, duration) {
         var interval = 10
@@ -126,9 +125,9 @@ function flashChatAnimation(backgroundSettings) {
             var a = parseInt(lerp(start.a, end.a, u))
             var colorname = `rgba( ${r},${g},${b},${a / 100.0} )`
             el.setAttribute('style', `${property}: ${colorname} !important`)
-            u += step_u;
-        }, interval);
-    };
+            u += step_u
+        }, interval)
+    }
 
     el = frameBody.querySelector('.chat-room')
     property = 'background-color'
@@ -186,41 +185,41 @@ function addOverlayFunctions(overlayWrapper, dragBox, frameBody) {
 
 
 function setDraggable(draggable, container) {
-    let fsElement = document.querySelector('.video-player__overlay');
+    let fsElement = document.querySelector('.video-player__overlay')
     let videoPlayerHeight = null, videoPlayerWidth = null
 
-    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    draggable.onmousedown = dragMouseDown;
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0
+    draggable.onmousedown = dragMouseDown
 
     function dragMouseDown(e) {
         videoPlayerHeight = fsElement.offsetHeight
         videoPlayerWidth = fsElement.offsetWidth
 
-        e = e || window.event;
-        e.preventDefault();
+        e = e || window.event
+        e.preventDefault()
         // get the mouse cursor position at startup:
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        frameBody.onmouseup = closeDragElement;
+        pos3 = e.clientX
+        pos4 = e.clientY
+        document.onmouseup = closeDragElement
+        frameBody.onmouseup = closeDragElement
         // call a function whenever the cursor moves:
-        document.onmousemove = elementDrag;
+        document.onmousemove = elementDrag
     }
 
     function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
+        e = e || window.event
+        e.preventDefault()
         // calculate the new cursor:
-        pos1 = pos3 - e.clientX;
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
+        pos1 = pos3 - e.clientX
+        pos2 = pos4 - e.clientY
+        pos3 = e.clientX
+        pos4 = e.clientY
 
         // set the element's new position:
         let offsetTop = container.offsetTop - pos2
         let offsetLeft = container.offsetLeft - pos1
-        container.style.top = offsetTop + "px";
-        container.style.left = offsetLeft + "px";
+        container.style.top = offsetTop + 'px'
+        container.style.left = offsetLeft + 'px'
 
         if (container.offsetTop < 0) {
             container.style.top = '0px'
@@ -238,10 +237,9 @@ function setDraggable(draggable, container) {
 
     function closeDragElement() {
         // stop moving when mouse button is released:
-        document.onmouseup = null;
-        frameBody.onmouseup = null;
-
-        document.onmousemove = null;
+        document.onmouseup = null
+        frameBody.onmouseup = null
+        document.onmousemove = null
     }
 }
 
@@ -257,11 +255,24 @@ function observeChannelChange(videoPlayer) {
                 if (frameBody) frameBody = null
                 waitForVideo()
             }
+
+            if (mutation.attributeName === 'data-a-player-type') {
+                if (videoPlayer.getAttribute('data-a-player-type') !== 'site') {
+                    observer.disconnect()
+                    if (overlay) overlay.remove()
+                    if (toggleOverlayButton) toggleOverlayButton.remove()
+                    if (frameBody) frameBody = null
+                    waitForVideo()
+                }
+
+            }
+
+
         }
 
-    });
-    const config = { attributes: true, subtree: true };
-    observer.observe(videoPlayer, config);
+    })
+    const config = { attributes: true, subtree: true }
+    observer.observe(videoPlayer, config)
 }
 
 
