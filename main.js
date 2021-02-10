@@ -33,6 +33,7 @@ function init() {
     fsElement.appendChild(overlay)
 
     videoPlayer.addEventListener('fullscreenchange', changedFullscreen, false)
+    changedFullscreen()
 }
 
 
@@ -176,7 +177,7 @@ function addOverlayFunctions(overlayWrapper, dragBox, frameBody) {
 
     }
     overlayWrapper.onmouseout = () => {
-        overlayWrapper.style.borderStyle = 'hidden'
+        overlayWrapper.style.border = '2px solid transparent'
         overlayWrapper.style.resize = 'none'
         dragBox.style.visibility = 'hidden'
         let chatInput = frameBody.querySelector('.chat-input')

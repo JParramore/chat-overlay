@@ -2,6 +2,7 @@
     position: absolute;
     z-index: 2147483647;
     resize: none;
+    border: 2px solid transparent;
     border-radius: 5px;
 }
 
