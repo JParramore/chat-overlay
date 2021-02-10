@@ -9,8 +9,8 @@
 .overlay-wrapper {
     min-width: 275px;
     min-height: 200px;
-    height: 500px;
-    width: 500px;
+    height: 40%;
+    width: 30%;
     display: none;
     overflow: auto;
 }

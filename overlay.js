@@ -223,9 +223,9 @@ function updateSettings() {
     let messageContainer = document.querySelector('.chat-scrollable-area__message-container')
     let chatRoom = document.querySelector('.chat-room')
     let messageArea = document.querySelector('.chat-scrollable-area__message-container')
-    let chatList = chatRoom.querySelector('.chat-list--other')
-    let scrollBar = chatList.querySelector('.simplebar-scrollbar')
-    let overlaySettingsContainer = chatRoom.querySelector('.overlay-settings-container')
+    let chatList = document.querySelector('.chat-list--other')
+    let scrollBar = document.querySelector('.simplebar-scrollbar')
+    let overlaySettingsContainer = document.querySelector('.overlay-settings-container')
 
     let { red, green, blue, alpha } = settings.background
     let { fontSize, bold, opacity } = settings.chat
