@@ -6,11 +6,12 @@ let frameBody = null
 function waitForVideo() {
     const timeNow = Date.now()
     const int = setInterval(() => {
-        if (Date.now() - timeNow > 10000) {
+        if (Date.now() - timeNow > 1000000) {
             clearInterval(int)
         }
         const video = document.querySelector('.video-player')
-        if (video && video.getAttribute('data-a-player-type') === 'site') {
+        const isVod =  document.querySelector('.qa-vod-chat')
+        if (video && video.getAttribute('data-a-player-type') === 'site' && !isVod) {
             init()
             clearInterval(int)
         }
@@ -264,12 +265,8 @@ function observeChannelChange(videoPlayer) {
                     if (frameBody) frameBody = null
                     waitForVideo()
                 }
-
             }
-
-
         }
-
     })
     const config = { attributes: true, subtree: true }
     observer.observe(videoPlayer, config)
