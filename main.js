@@ -10,6 +10,7 @@ function waitForVideo() {
             clearInterval(int)
         }
         const video = document.querySelector('.video-player')
+        console.log(video)
         if (video && video.getAttribute('data-a-player-type') === 'site') {
             init()
             clearInterval(int)
@@ -31,20 +32,6 @@ function init() {
 
     fsElement = document.querySelector('.video-player__overlay');
     fsElement.appendChild(overlay)
-
-    videoPlayer.addEventListener('fullscreenchange', changedFullscreen, false)
-    changedFullscreen()
-}
-
-
-// Fullscreen lister function
-function changedFullscreen() {
-    if (document.fullscreenElement) {
-        toggleOverlayButton.style.display = 'flex'
-    } else {
-        toggleOverlayButton.style.display = 'none'
-        overlay.style.display = 'none'
-    }
 }
 
 
@@ -70,12 +57,24 @@ function buildToggleOverlayButton() {
         }
     }
 
-    let label = document.createElement('span')
-    label.className = 'tw-align-items-center tw-core-button-label tw-flex tw-flex-grow-0 tw-core-button-label-text'
-    label.innerHTML = 'Overlay'
+    let span = document.createElement('span')
+    span.className = 'tw-button-icon__icon'
+
+    let svgContainer = document.createElement('div')
+    svgContainer.setAttribute('style', 'width: 2rem; height: 2rem;')
+
+    svgContainer.innerHTML = `<svg class="svg-icon" viewBox="0 0 20 20">
+    <path fill="none" d="M18.783,13.198H15.73c-0.431,0-0.78-0.35-0.78-0.779c0-0.433,0.349-0.78,0.78-0.78h2.273V3.652H7.852v0.922
+    c0,0.433-0.349,0.78-0.78,0.78c-0.431,0-0.78-0.347-0.78-0.78V2.872c0-0.43,0.349-0.78,0.78-0.78h11.711
+    c0.431,0,0.78,0.35,0.78,0.78v9.546C19.562,12.848,19.214,13.198,18.783,13.198z"></path>
+    <path fill="none" d="M12.927,17.908H1.217c-0.431,0-0.78-0.351-0.78-0.78V7.581c0-0.43,0.349-0.78,0.78-0.78h11.709
+    c0.431,0,0.78,0.35,0.78,0.78v9.546C13.706,17.557,13.357,17.908,12.927,17.908z M1.997,16.348h10.15V8.361H1.997V16.348z"></path>
+</svg>`
+
+    toggleOverlayBtn.appendChild(span)
+    span.appendChild(svgContainer)
 
     tglWrapper.appendChild(tooltip)
-    toggleOverlayBtn.appendChild(label)
     tglWrapper.appendChild(toggleOverlayBtn)
 
     return tglWrapper
@@ -226,7 +225,7 @@ function setDraggable(draggable, container) {
         if (container.offsetTop < 0) {
             container.style.top = '0px'
         }
-        if (container.offsetLeft < 0){
+        if (container.offsetLeft < 0) {
             container.style.left = '0px'
         }
         if (container.offsetTop + container.offsetHeight > videoPlayerHeight) {

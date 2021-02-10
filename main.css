@@ -21,10 +21,18 @@
     right: 10px;
 }
 
-.tgl-overlay-btn-wrapper {
-    display: none;
+.svg-icon {
+    width: 100%;
+    height: 100%;
+  }
+  
+.svg-icon path,
+.svg-icon polygon,
+.svg-icon rect {
+fill: rgb(145,71,255);
 }
-
-.toggle-overlay-btn {
-    width: 100% !important;
+  
+.svg-icon circle {
+stroke: rgb(145,71,255);
+stroke-width: 1;
 }
