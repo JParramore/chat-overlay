@@ -232,7 +232,6 @@ function setDraggable(draggable, container) {
         if (container.offsetLeft + container.offsetWidth > videoPlayerWidth) {
             container.style.left = `${videoPlayerWidth - container.offsetWidth}px`
         }
-
     }
 
     function closeDragElement() {

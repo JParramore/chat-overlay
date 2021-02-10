@@ -1,13 +1,15 @@
 const TO_HIDE = [
-    'channel-leaderboard',
-    'community-points-summary',
-    'stream-chat-header',
-    'community-highlight-stack__scroll-area--disable',
-    'community-highlight-stack__backlog-card',
-    'chat-input'
+    '.channel-leaderboard',
+    '.community-points-summary',
+    '.stream-chat-header',
+    '.community-highlight-stack__scroll-area--disable',
+    '.community-highlight-stack__backlog-card',
+    '.chat-input',
+    'button[data-a-target="chat-settings"]'
 ]
 
 let settings = {
+    open: false,
     background: {
         red: 31,
         green: 31,
@@ -38,39 +40,82 @@ function waitForChat() {
 
 function init() {
     document.body.settings = settings
-    TO_HIDE.forEach(className => displayNoneObserver(document.body, className))
-    insertOverlaySettings()
+    TO_HIDE.forEach(query => displayNoneObserver(document.body, query))
+    InsertSettings()
 }
 
+function InsertSettings() {
+    let chatSIContainer = document.querySelector('.chat-input')
+    chatSIContainer.classList.add('chat-settings-and-input-container')
+
+    let chatInput = chatSIContainer.querySelector('.chat-input__buttons-container').parentElement
+    chatInput.className = 'chat-input-container'
+
+    chatSIContainer.appendChild(buildOverlaySettings())
+    updateSettings()
+}
+
+function toggleShowSettings() {
+    var elem = document.querySelector('.overlay-settings-container')
+    var pos = 0
+    let start = elem.offsetTop
+    var id = setInterval(frame, 10)
+    let moveDistance = elem.offsetHeight
+    function frame() {
+        if (pos >= moveDistance) {
+            clearInterval(id)
+        } else {
+            pos += 10
+            elem.style.top = settings.open ? `${start + pos}px` : `${start - pos}px`
+        }
+    }
+    settings.open = start === 0 ? false : true
+}
+
+
+
 // Build and append overlay settings to overlay
-function insertOverlaySettings() {
-    let chatSettingsBar = document.querySelector('.chat-input__buttons-container')
+function buildOverlaySettings() {
+    let settingsWrapper = document.createElement('div')
+    settingsWrapper.className = 'settings-wrapper'
 
     let overlaySettingsContainer = document.createElement('div')
-    overlaySettingsContainer.className = "overlay-settings-container"
+    overlaySettingsContainer.className = 'overlay-settings-container'
 
-    let subSettingsContainerOne = document.createElement('div')
-    let subSettingsContainerTwo = document.createElement('div')
-    subSettingsContainerOne.className = 'settings-sub-container'
-    subSettingsContainerTwo.className = 'settings-sub-container'
+    let settingsButtonContainer = document.createElement('div')
+    settingsButtonContainer.className = 'settings-btn-container'
 
-    subSettingsContainerOne.appendChild(buildAlphaSlider())
-    subSettingsContainerOne.appendChild(buildOpacitySlider())
+    let stylesheet = document.createElement('link')
+    stylesheet.rel = 'stylesheet'
+    stylesheet.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'
 
-    subSettingsContainerTwo.appendChild(buildFontSlider())
+    let settingsButton = document.createElement('button')
+    settingsButton.className = 'settings-button tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-button-icon tw-core-button tw-inline-flex tw-justify-content-center tw-overflow-hidden tw-relative'
+    settingsButton.setAttribute('aria-label', 'Overlay Settings')
+    settingsButton.onclick = toggleShowSettings
 
-    let subsubSettingsContainer = document.createElement('div')
-    subsubSettingsContainer.className = 'settings-sub-container'
+    let label = document.createElement('i')
+    label.className = 'fas fa-cog tw-align-items-center tw-core-button-label tw-flex tw-flex-grow-0'
 
-    subsubSettingsContainer.appendChild(buildBoldChatToggle())
-    subsubSettingsContainer.appendChild(buildDarkthemeToggle())
+    settingsButton.appendChild(label)
+    overlaySettingsContainer.appendChild(stylesheet)
+    settingsButtonContainer.appendChild(settingsButton)
 
-    subSettingsContainerTwo.appendChild(subsubSettingsContainer)
+    let subContainer = document.createElement('div')
+    subContainer.className = 'settings-sub-container'
 
-    overlaySettingsContainer.appendChild(subSettingsContainerOne)
-    overlaySettingsContainer.appendChild(subSettingsContainerTwo)
+    subContainer.appendChild(buildAlphaSlider())
+    subContainer.appendChild(buildOpacitySlider())
+    subContainer.appendChild(buildFontSlider())
+    subContainer.appendChild(buildBoldChatToggle())
+    subContainer.appendChild(buildDarkthemeToggle())
 
-    chatSettingsBar.prepend(overlaySettingsContainer)
+    overlaySettingsContainer.appendChild(subContainer)
+    overlaySettingsContainer.appendChild(settingsButtonContainer)
+
+    settingsWrapper.appendChild(overlaySettingsContainer)
+
+    return settingsWrapper
 }
 
 
@@ -180,6 +225,8 @@ function updateSettings() {
     let messageArea = document.querySelector('.chat-scrollable-area__message-container')
     let chatList = chatRoom.querySelector('.chat-list--other')
     let scrollBar = chatList.querySelector('.simplebar-scrollbar')
+    let overlaySettingsContainer = chatRoom.querySelector('.overlay-settings-container')
+    let settingsButtonContainer = overlaySettingsContainer.querySelector('.settings-btn-container')
 
     let { red, green, blue, alpha } = settings.background
     let { fontSize, bold, opacity } = settings.chat
@@ -190,6 +237,9 @@ function updateSettings() {
     scrollBar.style.opacity = alpha
     chatRoom.setAttribute('style', `background-color: rgba(${red},${green},${blue},${alpha}) !important;`)
 
+    overlaySettingsContainer.style.backgroundColor = `rgb(${red},${green},${blue})`
+    settingsButtonContainer.setAttribute('style', `background-color: rgba(${red},${green},${blue},1) !important;`)
+   
     document.body.settings = settings
 }
 
@@ -276,17 +326,18 @@ function buildOpacitySlider() {
 
 
 // Hide elements we don't want to see on overlay as they appear
-function displayNoneObserver(parent, className, stopLooking = true) {
+function displayNoneObserver(parent, query, stopLooking = true) {
     let observer = new MutationObserver(function (mutationsList, observer) {
 
         for (const mutation of mutationsList) {
             if (mutation.type === 'childList') {
                 mutation.addedNodes.forEach(node => {
-                    let element = parent.querySelector(`.${className}`)
+                    let element = parent.querySelector(`${query}`)
                     if (element) {
-                        element.classList.add(`${className}_hide`)
+                        element.classList.add(`${query.charAt(0) === '.' ? query.substring(1) : 'class'}_hide`)
                         element.classList.remove('tw-flex')
                         element.classList.remove('tw-block')
+                        element.classList.remove('tw-inline-flex')
                         observer.disconnect()
                     }
                 })

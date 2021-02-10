@@ -1,6 +1,10 @@
 
 /* TODO: TOGGLEABLES */
 
+.class_hide {
+    display: none !important;
+}
+
 .channel-leaderboard_hide {
     display: none !important;
 }
@@ -25,6 +29,7 @@
     display: none !important;
 }
 
+
 /* OTHERS */
 
 html, body {
@@ -39,26 +44,37 @@ html, body {
     background-color: rgba(31, 31, 35, 0.25) !important;
 }
 
+.settings-wrapper {
+    position: relative;
+}
+
+.chat-input-container {
+    padding-bottom: 0.5rem;
+}
+
 .overlay-settings-container {
-    min-height: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
+    z-index: 2147483647;
+    position: absolute;
+    width: 100%;
+    border-radius: 5px;
 }
 
 .settings-sub-container {
-    padding-right: 10px;
+    padding: 1rem;
 }
 
 .setting-container {
     display: flex;
-    width: 175px;
-    align-items: center;
     justify-content: space-between;
+    font-weight: bold;
 }
 
-.slider {
-    width: 75px;
+.settings-btn-container {
+    z-index: 2147483647;
+    position: absolute;
+    top: -20px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 input[type="range"] {
@@ -121,3 +137,7 @@ input[type="range"]::-webkit-slider-thumb {
   .toggle-slider:before {
     border-radius: 50%;
   }
+
+
+
+  /* */
