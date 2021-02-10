@@ -30,4 +30,4 @@ Simple chrome extension for twitch that allows users to view twitch chat in full
 
 Movable, resizable, transparent chat box overlay:
 
-<img src="https://im3.ezgif.com/tmp/ezgif-3-951ffcbc664f.gif" alt="Overlay Demo"/>
+<img src="https://im3.ezgif.com/tmp/ezgif-3-951ffcbc664f.gif" alt="Overlay Demo" width='400px'/>
