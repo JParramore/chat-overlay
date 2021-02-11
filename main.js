@@ -51,7 +51,7 @@ function buildToggleOverlayButton() {
     toggleOverlayBtn.onclick = function () {
         if (!overlay.style.display || overlay.style.display == 'none') {
             overlay.style.display = 'flex'
-            flashChatAnimation()
+            if(frameBody && frameBody.ownerDocument.readyState === 'complete') flashChatAnimation()
         } else {
             overlay.style.display = 'none'
         }

@@ -1,7 +1,7 @@
 {
   "name": "Twitch Chat Overlay",
   "version": "1.0",
-  "description": "Overlay chat of fullscreen video",
+  "description": "Twitch Chat Overlay enhances the Twitch chat experience with a better pop-out chat with more features and customisation.",
   "permissions": [
     "activeTab",
     "declarativeContent",
@@ -13,8 +13,8 @@
         "https://www.twitch.tv/*"
       ],
       "exclude_matches": [
-        "*://*/*/*chat*"
-        ,"*://*/videos/*"
+        "*://*/*/*chat*",
+        "*://*/videos/*"
       ],
       "js": [
         "main.js"

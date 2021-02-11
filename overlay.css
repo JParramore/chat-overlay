@@ -52,6 +52,11 @@ html, body {
     background-color: rgba(31, 31, 35, 0.25) !important;
 }
 
+.chat-scrollable-area__message-container .chat-line__message, .chat-line__moderation, .chat-line__status, .user-notice-line {
+    padding-left: 1rem !important; 
+    padding-right: 1rem !important;
+}
+
 .settings-wrapper {
     position: relative;
     width: 250px;
