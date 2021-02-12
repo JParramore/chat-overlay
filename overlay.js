@@ -90,12 +90,12 @@ function buildOverlaySettings() {
     stylesheet.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'
 
     let settingsButton = document.createElement('button')
-    settingsButton.className = 'settings-button tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-core-button tw-core-button--primary tw-inline-flex tw-justify-content-center'
+    settingsButton.className = 'settings-button tw-core-button jeBpig'
     settingsButton.setAttribute('aria-label', 'Overlay Settings')
     settingsButton.onclick = toggleShowSettings
 
     let label = document.createElement('i')
-    label.className = 'fas fa-cog tw-align-items-center tw-core-button-label tw-flex tw-flex-grow-0'
+    label.className = 'fas fa-cog tw-core-button-label xsINH'
 
     settingsButton.appendChild(label)
     overlaySettingsContainer.appendChild(stylesheet)

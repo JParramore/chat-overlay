@@ -150,11 +150,11 @@ function buildDragElement() {
     stylesheet.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'
 
     let dragBtn = document.createElement('button')
-    dragBtn.className = 'drag-btn tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-core-button tw-core-button--primary tw-inline-flex tw-justify-content-center'
+    dragBtn.className = 'drag-btn jeBpig tw-core-button'
     dragBtn.style.cursor = 'move'
 
     let label = document.createElement('i')
-    label.className = 'fa fa-arrows-alt tw-align-items-center tw-core-button-label tw-flex tw-flex-grow-0'
+    label.className = 'fa fa-arrows-alt tw-core-button-label xsINH'
 
 
     dragBtn.appendChild(label)
