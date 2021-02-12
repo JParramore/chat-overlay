@@ -118,7 +118,7 @@ function buildOverlaySettings() {
     stylesheet.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'
 
     let settingsButton = document.createElement('button')
-    settingsButton.className = 'settings-button tw-core-button jeBpig'
+    settingsButton.className = 'settings-button tw-core-button jeBpig tw-core-button--primary  tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium'
     settingsButton.setAttribute('aria-label', 'Overlay Settings')
     settingsButton.onclick = animateShowSettingsComponent
 
