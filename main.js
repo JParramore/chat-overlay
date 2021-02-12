@@ -132,7 +132,9 @@ function flashChatAnimation() {
 
     el = frameBody.querySelector('.chat-room')
     property = 'background-color'
-    let { red, green, blue, alpha } = frameBody.settings.background
+    let darkMode = frameBody.overlaySettings.darkMode
+    let { red, green, blue } = darkMode ? frameBody.overlaySettings.theme.darkBackground : frameBody.overlaySettings.theme.lightBackground
+    let alpha = frameBody.overlaySettings.theme.alpha
     startColor = { r: 145, g: 71, b: 255, a: 100 }
     endColor = { r: red, g: green, b: blue, a: (alpha * 100.0) }
     fade(el, 'background-color', startColor, endColor, 1000)

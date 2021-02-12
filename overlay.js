@@ -8,26 +8,37 @@ const TO_HIDE = [
     'button[data-a-target="chat-settings"]'
 ]
 
-let settings = {
+let settings = null
+
+const DEFAULT_SETTINGS = {
     open: false,
-    background: {
-        red: 31,
-        green: 31,
-        blue: 35,
+    darkMode: true,
+    theme: {
+        darkBackground: {
+            red: 31,
+            green: 31,
+            blue: 35,
+        },
+        lightBackground: {
+            red: 255,
+            green: 255,
+            blue: 255,
+        },
         alpha: 0.25,
     },
     chat: {
         fontSize: 14,
         bold: false,
         opacity: 1.0,
-    }
+    },
 }
 
-
+// wait until chat area has loaded then init, timeout after 10 seconds
 function waitForChat() {
     const timeNow = Date.now()
     const int = setInterval(() => {
         if (Date.now() - timeNow > 10000) {
+            console.error('Overlay timed out: Failed to find chat in the frame')
             clearInterval(int)
         }
         const chat = document.querySelector('.chat-scrollable-area__message-container')
@@ -38,12 +49,28 @@ function waitForChat() {
     }, 500)
 }
 
+
+
 function init() {
-    document.body.settings = settings
-    TO_HIDE.forEach(query => displayNoneObserver(document.body, query))
-    InsertSettings()
+    getSettingsFromStorage()
+    TO_HIDE.forEach(query => displayNoneObserver(document.body, query, query.includes('community-highlight') ? false : true))
 }
 
+
+// Load settings from storage if exists otherwise set default settings
+function getSettingsFromStorage() {
+    chrome.storage.sync.get(['overlaySettings'], function (result) {
+        if (result && Object.keys(result).length === 0) {
+            settings = DEFAULT_SETTINGS
+        } else {
+            settings = result.overlaySettings
+        }
+        document.body.overlaySettings = settings
+        InsertSettings()
+    })
+}
+
+// Add settings component to chat input container
 function InsertSettings() {
     let chatSIContainer = document.querySelector('.chat-input')
     chatSIContainer.classList.add('chat-settings-and-input-container')
@@ -55,7 +82,9 @@ function InsertSettings() {
     updateSettings()
 }
 
-function toggleShowSettings() {
+
+// Animate the settings component
+function animateShowSettingsComponent() {
     var elem = document.querySelector('.overlay-settings-container')
     var pos = 0
     let start = elem.offsetTop
@@ -73,8 +102,7 @@ function toggleShowSettings() {
 }
 
 
-
-// Build and append overlay settings to overlay
+// Build overlay settings component
 function buildOverlaySettings() {
     let settingsWrapper = document.createElement('div')
     settingsWrapper.className = 'settings-wrapper'
@@ -92,7 +120,7 @@ function buildOverlaySettings() {
     let settingsButton = document.createElement('button')
     settingsButton.className = 'settings-button tw-core-button jeBpig'
     settingsButton.setAttribute('aria-label', 'Overlay Settings')
-    settingsButton.onclick = toggleShowSettings
+    settingsButton.onclick = animateShowSettingsComponent
 
     let label = document.createElement('i')
     label.className = 'fas fa-cog tw-core-button-label xsINH'
@@ -133,20 +161,16 @@ function buildDarkthemeToggle() {
 
     let input = document.createElement('input')
     input.type = 'checkbox'
-    input.checked = true
+    input.checked = settings.darkMode
     input.className = 'tw-toggle__input'
     input.id = 'overlay-chat-settings-dark-mode'
     input.setAttribute('data-a-target', 'tw-toggle')
     input.onchange = function () {
         if (this.checked) {
-            toggleThemeDark(true)
-            let a = settings.background.alpha
-            settings.background = { red: 31, green: 31, blue: 35, alpha: a }
+            settings.darkMode = true
             updateSettings()
         } else {
-            toggleThemeDark(false)
-            let a = settings.background.alpha
-            settings.background = { red: 255, green: 255, blue: 255, alpha: a }
+            settings.darkMode = false
             updateSettings()
         }
     }
@@ -165,6 +189,7 @@ function buildDarkthemeToggle() {
 }
 
 
+// Build Chunky Chat toggle setting component
 function buildBoldChatToggle() {
     let tglContainer = document.createElement('div')
     tglContainer.className = 'setting-container'
@@ -178,7 +203,7 @@ function buildBoldChatToggle() {
 
     let input = document.createElement('input')
     input.type = 'checkbox'
-    input.checked = false
+    input.checked = settings.chat.bold
     input.className = 'tw-toggle__input'
     input.id = 'overlay-chat-settings-embolden'
     input.setAttribute('data-a-target', 'tw-toggle')
@@ -218,29 +243,6 @@ function toggleThemeDark(darkMode) {
 }
 
 
-// Update overlay styles with settings
-function updateSettings() {
-    let messageContainer = document.querySelector('.chat-scrollable-area__message-container')
-    let chatRoom = document.querySelector('.chat-room')
-    let messageArea = document.querySelector('.chat-scrollable-area__message-container')
-    let chatList = document.querySelector('.chat-list--other')
-    let scrollBar = document.querySelector('.simplebar-scrollbar')
-    let overlaySettingsContainer = document.querySelector('.overlay-settings-container')
-
-    let { red, green, blue, alpha } = settings.background
-    let { fontSize, bold, opacity } = settings.chat
-
-    messageContainer.setAttribute('style',`font-size: ${fontSize}px !important`)
-    messageContainer.style.fontWeight = bold ? 'bold' : 'normal'
-    messageArea.style.opacity = opacity
-    scrollBar.style.opacity = alpha
-    chatRoom.setAttribute('style', `background-color: rgba(${red},${green},${blue},${alpha}) !important;`)
-    overlaySettingsContainer.style.backgroundColor = `rgb(${red},${green},${blue})`
-   
-    document.body.settings = settings
-}
-
-
 // Build font slider setting
 function buildFontSlider() {
     let fontSliderContainer = document.createElement('div')
@@ -254,7 +256,7 @@ function buildFontSlider() {
     fontSlider.type = 'range'
     fontSlider.min = '8'
     fontSlider.max = '30'
-    fontSlider.value = '14'
+    fontSlider.value = settings.chat.fontSize
     fontSlider.className = 'font-slider slider'
     fontSlider.oninput = function () {
         settings.chat.fontSize = this.value
@@ -281,10 +283,10 @@ function buildAlphaSlider() {
     alphaSlider.type = 'range'
     alphaSlider.min = '1'
     alphaSlider.max = '100'
-    alphaSlider.value = '25'
+    alphaSlider.value = settings.theme.alpha * 100
     alphaSlider.className = 'alpha-slider slider'
     alphaSlider.oninput = function () {
-        settings.background.alpha = (this.value / 100)
+        settings.theme.alpha = (this.value / 100)
         updateSettings()
     }
 
@@ -308,7 +310,7 @@ function buildOpacitySlider() {
     opacitySlider.type = 'range'
     opacitySlider.min = '1'
     opacitySlider.max = '100'
-    opacitySlider.value = '100'
+    opacitySlider.value = settings.chat.opacity * 100
     opacitySlider.className = 'opacity-slider slider'
     opacitySlider.oninput = function () {
         settings.chat.opacity = this.value / 100
@@ -319,6 +321,33 @@ function buildOpacitySlider() {
     opacitySliderContainer.appendChild(opacitySlider)
 
     return opacitySliderContainer
+}
+
+
+// Update overlay styles with settings
+function updateSettings() {
+    let messageContainer = document.querySelector('.chat-scrollable-area__message-container')
+    let chatRoom = document.querySelector('.chat-room')
+    let messageArea = document.querySelector('.chat-scrollable-area__message-container')
+    let chatList = document.querySelector('.chat-list--other')
+    let scrollBar = document.querySelector('.simplebar-scrollbar')
+    let overlaySettingsContainer = document.querySelector('.overlay-settings-container')
+
+    let darkMode = settings.darkMode
+    let { red, green, blue } = darkMode ? settings.theme.darkBackground : settings.theme.lightBackground
+    let alpha = settings.theme.alpha
+    let { fontSize, bold, opacity } = settings.chat
+
+    toggleThemeDark(darkMode)
+    messageContainer.setAttribute('style', `font-size: ${fontSize}px !important`)
+    messageContainer.style.fontWeight = bold ? 'bold' : 'normal'
+    messageArea.style.opacity = opacity
+    scrollBar.style.opacity = alpha
+    chatRoom.setAttribute('style', `background-color: rgba(${red},${green},${blue},${alpha}) !important;`)
+    overlaySettingsContainer.style.backgroundColor = `rgb(${red},${green},${blue})`
+
+    chrome.storage.sync.set({ 'overlaySettings': settings })
+    document.body.overlaySettings = settings
 }
 
 
