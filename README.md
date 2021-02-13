@@ -17,6 +17,7 @@ Movable, resizable, transparent chat box overlay:
 - Change overlay chat message font size
 - Light/Dark themes for overlay
 - Move and resize overlay
+- User settings are saved
 
 <br>
 
