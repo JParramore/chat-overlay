@@ -9,59 +9,66 @@ function waitForVideo() {
         if (Date.now() - timeNow > 1000000) {
             clearInterval(int)
         }
-        const video = document.querySelector('.video-player')
-        const isVod =  document.querySelector('.qa-vod-chat')
-        if (video && video.getAttribute('data-a-player-type') === 'site' && !isVod) {
+        const video = document.querySelector(".video-player")
+        const isVod = document.querySelector(".qa-vod-chat")
+        if (
+            video &&
+            video.getAttribute("data-a-player-type") === "site" &&
+            !isVod
+        ) {
             init()
             clearInterval(int)
         }
     }, 500)
 }
 
-
 // DOM content loaded
 function init() {
     overlay = buildOverlay()
     toggleOverlayButton = buildToggleOverlayButton()
 
-    let videoPlayer = document.querySelector('.video-player')
+    let videoPlayer = document.querySelector(".video-player")
     observeChannelChange(videoPlayer)
 
-    let playerControls = document.querySelector('.player-controls__right-control-group')
+    let playerControls = document.querySelector(
+        ".player-controls__right-control-group"
+    )
     playerControls.prepend(toggleOverlayButton)
 
-    fsElement = document.querySelector('.video-player__overlay')
+    fsElement = document.querySelector(".video-player__overlay")
     fsElement.appendChild(overlay)
 }
 
-
 // Build and insert toggle overlay
 function buildToggleOverlayButton() {
-    let tglWrapper = document.createElement('div')
-    tglWrapper.className = 'tgl-overlay-btn-wrapper tw-relative tw-tooltip__container'
+    let tglWrapper = document.createElement("div")
+    tglWrapper.className =
+        "tgl-overlay-btn-wrapper tw-relative tw-tooltip__container"
 
-    let tooltip = document.createElement('div')
-    tooltip.className = 'tw-tooltip tw-tooltip--align-right tw-tooltip--up'
-    tooltip.role = 'tooltip'
-    tooltip.innerHTML = 'Toggle Overlay'
+    let tooltip = document.createElement("div")
+    tooltip.className = "tw-tooltip tw-tooltip--align-right tw-tooltip--up"
+    tooltip.role = "tooltip"
+    tooltip.innerHTML = "Toggle Overlay"
 
-    let toggleOverlayBtn = document.createElement('button')
-    toggleOverlayBtn.className = 'toggle-overlay-btn tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-button-icon tw-button-icon--overlay tw-core-button tw-core-button--overlay tw-justify-content-center'
-    toggleOverlayBtn.ariaLabel = 'Toggle Chat Overlay'
+    let toggleOverlayBtn = document.createElement("button")
+    toggleOverlayBtn.className =
+        "toggle-overlay-btn tw-align-items-center tw-align-middle tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium tw-button-icon tw-button-icon--overlay tw-core-button tw-core-button--overlay tw-justify-content-center"
+    toggleOverlayBtn.ariaLabel = "Toggle Chat Overlay"
     toggleOverlayBtn.onclick = function () {
-        if (!overlay.style.display || overlay.style.display == 'none') {
-            overlay.style.display = 'flex'
-            if(frameBody && frameBody.ownerDocument.readyState === 'complete') flashChatAnimation()
+        if (!overlay.style.display || overlay.style.display == "none") {
+            overlay.style.display = "flex"
+            if (frameBody && frameBody.ownerDocument.readyState === "complete")
+                flashChatAnimation()
         } else {
-            overlay.style.display = 'none'
+            overlay.style.display = "none"
         }
     }
 
-    let span = document.createElement('span')
-    span.className = 'tw-button-icon__icon'
+    let span = document.createElement("span")
+    span.className = "tw-button-icon__icon"
 
-    let svgContainer = document.createElement('div')
-    svgContainer.setAttribute('style', 'width: 2rem; height: 2rem;')
+    let svgContainer = document.createElement("div")
+    svgContainer.setAttribute("style", "width: 2rem; height: 2rem;")
 
     svgContainer.innerHTML = `<svg class="svg-icon" viewBox="0 0 20 20">
     <path fill="none" d="M18.783,13.198H15.73c-0.431,0-0.78-0.35-0.78-0.779c0-0.433,0.349-0.78,0.78-0.78h2.273V3.652H7.852v0.922
@@ -80,21 +87,20 @@ function buildToggleOverlayButton() {
     return tglWrapper
 }
 
-
 // Build overlay
 function buildOverlay() {
-    overlayWrapper = document.createElement('div')
-    overlayWrapper.className = 'wrapper overlay-wrapper'
+    overlayWrapper = document.createElement("div")
+    overlayWrapper.className = "wrapper overlay-wrapper"
 
-    let video = document.querySelector('video')
+    let video = document.querySelector("video")
     let url = new URL(video.baseURI)
     let slug = url.pathname
 
-    let chatFrame = document.createElement('iframe')
-    chatFrame.className = 'chat-frame'
+    let chatFrame = document.createElement("iframe")
+    chatFrame.className = "chat-frame"
     chatFrame.src = `https://www.twitch.tv${slug}/chat`
-    chatFrame.height = '100%'
-    chatFrame.width = '100%'
+    chatFrame.height = "100%"
+    chatFrame.width = "100%"
     chatFrame.onload = function () {
         frameBody = this.contentWindow.document.body
         let dragBox = buildDragElement()
@@ -105,7 +111,6 @@ function buildOverlay() {
 
     return overlayWrapper
 }
-
 
 // Fade in transition to make it clear chat has been opened https://stackoverflow.com/a/11293378/14549357
 function flashChatAnimation() {
@@ -119,45 +124,48 @@ function flashChatAnimation() {
         var step_u = 1.0 / steps
         var u = 0.0
         var theInterval = setInterval(function () {
-            if (u >= 1.0) { clearInterval(theInterval) }
+            if (u >= 1.0) {
+                clearInterval(theInterval)
+            }
             var r = parseInt(lerp(start.r, end.r, u))
             var g = parseInt(lerp(start.g, end.g, u))
             var b = parseInt(lerp(start.b, end.b, u))
             var a = parseInt(lerp(start.a, end.a, u))
             var colorname = `rgba( ${r},${g},${b},${a / 100.0} )`
-            el.setAttribute('style', `${property}: ${colorname} !important`)
+            el.setAttribute("style", `${property}: ${colorname} !important`)
             u += step_u
         }, interval)
     }
 
-    el = frameBody.querySelector('.chat-room')
-    property = 'background-color'
+    el = frameBody.querySelector(".chat-room")
+    property = "background-color"
     let darkMode = frameBody.overlaySettings.darkMode
-    let { red, green, blue } = darkMode ? frameBody.overlaySettings.theme.darkBackground : frameBody.overlaySettings.theme.lightBackground
+    let { red, green, blue } = darkMode
+        ? frameBody.overlaySettings.theme.darkBackground
+        : frameBody.overlaySettings.theme.lightBackground
     let alpha = frameBody.overlaySettings.theme.alpha
     startColor = { r: 145, g: 71, b: 255, a: 100 }
-    endColor = { r: red, g: green, b: blue, a: (alpha * 100.0) }
-    fade(el, 'background-color', startColor, endColor, 1000)
+    endColor = { r: red, g: green, b: blue, a: alpha * 100.0 }
+    fade(el, "background-color", startColor, endColor, 1000)
 }
 
-
-
 function buildDragElement() {
-    let dragWrapper = document.createElement('div')
-    dragWrapper.className = 'drag-wrapper tw-mg-l-05'
-    dragWrapper.style.visibility = 'hidden'
+    let dragWrapper = document.createElement("div")
+    dragWrapper.className = "drag-wrapper tw-mg-l-05"
+    dragWrapper.style.visibility = "hidden"
 
-    let stylesheet = document.createElement('link')
-    stylesheet.rel = 'stylesheet'
-    stylesheet.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'
+    let stylesheet = document.createElement("link")
+    stylesheet.rel = "stylesheet"
+    stylesheet.href =
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
 
-    let dragBtn = document.createElement('button')
-    dragBtn.className = 'drag-btn jeBpig tw-core-button tw-core-button--primary tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium'
-    dragBtn.style.cursor = 'move'
+    let dragBtn = document.createElement("button")
+    dragBtn.className =
+        "drag-btn jeBpig tw-core-button tw-core-button--primary tw-border-bottom-left-radius-medium tw-border-bottom-right-radius-medium tw-border-top-left-radius-medium tw-border-top-right-radius-medium"
+    dragBtn.style.cursor = "move"
 
-    let label = document.createElement('i')
-    label.className = 'fa fa-arrows-alt tw-core-button-label xsINH'
-
+    let label = document.createElement("i")
+    label.className = "fa fa-arrows-alt tw-core-button-label xsINH"
 
     dragBtn.appendChild(label)
     dragWrapper.appendChild(stylesheet)
@@ -167,31 +175,32 @@ function buildDragElement() {
     return dragWrapper
 }
 
-
 function addOverlayFunctions(overlayWrapper, dragBox, frameBody) {
     overlayWrapper.onmouseover = () => {
-        overlayWrapper.style.border = '2px solid rgb(145,71,255)'
-        overlayWrapper.style.resize = 'auto'
-        dragBox.style.visibility = 'visible'
-        let chatInput = frameBody.querySelector('.chat-input')
-        chatInput.classList.remove('chat-input_hide')
-
+        overlayWrapper.style.border = "2px solid rgb(145,71,255)"
+        overlayWrapper.style.resize = "auto"
+        dragBox.style.visibility = "visible"
+        let chatInput = frameBody.querySelector(".chat-input")
+        chatInput.classList.remove("chat-input_hide")
     }
     overlayWrapper.onmouseout = () => {
-        overlayWrapper.style.border = '2px solid transparent'
-        overlayWrapper.style.resize = 'none'
-        dragBox.style.visibility = 'hidden'
-        let chatInput = frameBody.querySelector('.chat-input')
-        chatInput.classList.add('chat-input_hide')
+        overlayWrapper.style.border = "2px solid transparent"
+        overlayWrapper.style.resize = "none"
+        dragBox.style.visibility = "hidden"
+        let chatInput = frameBody.querySelector(".chat-input")
+        chatInput.classList.add("chat-input_hide")
     }
 }
 
-
 function setDraggable(draggable, container) {
-    let fsElement = document.querySelector('.video-player__overlay')
-    let videoPlayerHeight = null, videoPlayerWidth = null
+    let fsElement = document.querySelector(".video-player__overlay")
+    let videoPlayerHeight = null,
+        videoPlayerWidth = null
 
-    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0
+    var pos1 = 0,
+        pos2 = 0,
+        pos3 = 0,
+        pos4 = 0
     draggable.onmousedown = dragMouseDown
 
     function dragMouseDown(e) {
@@ -221,20 +230,24 @@ function setDraggable(draggable, container) {
         // set the element's new position:
         let offsetTop = container.offsetTop - pos2
         let offsetLeft = container.offsetLeft - pos1
-        container.style.top = offsetTop + 'px'
-        container.style.left = offsetLeft + 'px'
+        container.style.top = offsetTop + "px"
+        container.style.left = offsetLeft + "px"
 
         if (container.offsetTop < 0) {
-            container.style.top = '0px'
+            container.style.top = "0px"
         }
         if (container.offsetLeft < 0) {
-            container.style.left = '0px'
+            container.style.left = "0px"
         }
         if (container.offsetTop + container.offsetHeight > videoPlayerHeight) {
-            container.style.top = `${videoPlayerHeight - container.offsetHeight}px`
+            container.style.top = `${
+                videoPlayerHeight - container.offsetHeight
+            }px`
         }
         if (container.offsetLeft + container.offsetWidth > videoPlayerWidth) {
-            container.style.left = `${videoPlayerWidth - container.offsetWidth}px`
+            container.style.left = `${
+                videoPlayerWidth - container.offsetWidth
+            }px`
         }
     }
 
@@ -246,12 +259,11 @@ function setDraggable(draggable, container) {
     }
 }
 
-
 // Load new overlay for new streamer
 function observeChannelChange(videoPlayer) {
     observer = new MutationObserver(function (mutationsList, observer) {
         for (const mutation of mutationsList) {
-            if (mutation.attributeName === 'src') {
+            if (mutation.attributeName === "src") {
                 observer.disconnect()
                 if (overlay) overlay.remove()
                 if (toggleOverlayButton) toggleOverlayButton.remove()
@@ -259,8 +271,8 @@ function observeChannelChange(videoPlayer) {
                 waitForVideo()
             }
 
-            if (mutation.attributeName === 'data-a-player-type') {
-                if (videoPlayer.getAttribute('data-a-player-type') !== 'site') {
+            if (mutation.attributeName === "data-a-player-type") {
+                if (videoPlayer.getAttribute("data-a-player-type") !== "site") {
                     observer.disconnect()
                     if (overlay) overlay.remove()
                     if (toggleOverlayButton) toggleOverlayButton.remove()
@@ -273,6 +285,5 @@ function observeChannelChange(videoPlayer) {
     const config = { attributes: true, subtree: true }
     observer.observe(videoPlayer, config)
 }
-
 
 waitForVideo()

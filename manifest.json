@@ -1,40 +1,15 @@
 {
-  "name": "Twitch Chat Overlay",
-  "version": "1.0",
-  "description": "Twitch Chat Overlay enhances the Twitch chat experience with a better pop-out chat with more features and customisation.",
-  "permissions": [
-    "activeTab",
-    "declarativeContent",
-    "storage"
-  ],
-  "content_scripts": [
-    {
-      "matches": [
-        "https://www.twitch.tv/*"
-      ],
-      "exclude_matches": [
-        "*://*/*/*chat*",
-        "*://*/videos/*"
-      ],
-      "js": [
-        "main.js"
-      ],
-      "css": [
-        "main.css"
-      ]
-    },
-    {
-      "matches": [
-        "https://www.twitch.tv/*/chat*"
-      ],
-      "js": [
-        "overlay.js"
-      ],
-      "css": [
-        "overlay.css"
-      ],
-      "all_frames": true
-    }
-  ],
-  "manifest_version": 2
+    "name": "Twitch Chat Overlay",
+    "version": "1.0",
+    "description": "Twitch Chat Overlay enhances the Twitch chat experience with a better pop-out chat with more features and customisation.",
+    "permissions": ["activeTab", "declarativeContent", "storage"],
+    "web_accessible_resources": ["test.js"],
+    "content_scripts": [
+        {
+            "matches": ["https://www.twitch.tv/*"],
+            "js": ["content.js"],
+            "css": ["styles.css"]
+        }
+    ],
+    "manifest_version": 2
 }
