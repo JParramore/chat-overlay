@@ -1,6 +1,10 @@
 const TC_CLASSES = {
     core: 'tc',
     overlay: 'tc-overlay',
+    overlayLive: 'tc-overlay-live',
+    overlayVod: 'tc-overlay-vod',
+    overlayVodChat: 'tc-overlay-vod-chat',
+    overlayButtonsContainer: 'tc-buttons-container',
     overlayButton: 'tc-overlay-button',
     buttonContainer: 'tc-button-container',
     settingsButton: 'tc-settings-button',
@@ -20,6 +24,7 @@ const TW_CLASSES = {
     chatInputButtonsContainer: 'chat-input__buttons-container',
     liveChat: 'stream-chat',
     vodChat: 'qa-vod-chat',
+    vodChatListWrapper: 'video-chat__message-list-wrapper',
     display: ['tw-flex', 'tw-block', 'tw-inline-flex'],
     buttons: {
         coreButton: [
@@ -86,12 +91,12 @@ const DEFAULT_SETTINGS = {
 }
 
 chrome.storage.sync.get(['overlaySettings'], function (result) {
-  if (result && Object.keys(result).length === 0) {
-      settings = DEFAULT_SETTINGS
-  } else {
-      settings = result.overlaySettings
-  }
-  document.body.overlaySettings = settings
+    if (result && Object.keys(result).length === 0) {
+        settings = DEFAULT_SETTINGS
+    } else {
+        settings = result.overlaySettings
+    }
+    document.body.overlaySettings = settings
 })
 
 // Wait until element exists then resolve on element https://gist.github.com/jwilson8767/db379026efcbd932f64382db4b02853e
@@ -115,4 +120,31 @@ const elementReady = (selector, doc) => {
     })
 }
 
-globalThis.overlay = { TW_CLASSES, TC_CLASSES, OVERLAY_BTN_SVG, settings, elementReady }
+const observeVodMessage = (twMessageWrapper) => {
+    observer = new MutationObserver(function (mutationsList, observer) {
+        for (const mutation of mutationsList) {
+            mutation.addedNodes.forEach((node) => {
+                if (node.matches(`li[class="tw-full-width`)) {
+                    let listContainer = document.querySelector(
+                        `.${TC_CLASSES.overlayVodChat} ul`
+                    )
+                    let clone = node.cloneNode(true)
+                    listContainer.appendChild(clone)
+                    let tcChat = document.querySelector('.tc-overlay-vod-chat')
+                    tcChat.scrollTop = tcChat.scrollHeight
+                }
+            })
+        }
+    })
+    const config = { childList: true, subtree: true }
+    observer.observe(twMessageWrapper, config)
+}
+
+globalThis.overlay = {
+    TW_CLASSES,
+    TC_CLASSES,
+    OVERLAY_BTN_SVG,
+    settings,
+    elementReady,
+    observeVodMessage,
+}

@@ -9,7 +9,8 @@ function init(isLive = true) {
     document.querySelectorAll(`.${core}`).forEach((element) => element.remove())
 
     let video = document.querySelector(`.${videoPlayerOverlay}`)
-    let overlayEl = buildOverlay()
+    console.log('is live ' + isLive)
+    let overlayEl = buildOverlay(isLive)
     video.appendChild(overlayEl)
 
     let videoControls = document.querySelector(`.${playerControls}`)
@@ -22,9 +23,15 @@ function init(isLive = true) {
     coreComponents.forEach((element) => element.classList.add(core))
 }
 
-function buildOverlay(isLive = true) {
-    const { overlay, chatFrame } = TC_CLASSES
-    const { toHide, display, chatInput, chatInputButtonsContainer } = TW_CLASSES
+function buildOverlay(isLive) {
+    const { overlay, chatFrame, overlayVodChat, overlayButtonsContainer } = TC_CLASSES
+    const {
+        toHide,
+        display,
+        vodChat,
+        chatInputButtonsContainer,
+        vodChatListWrapper,
+    } = TW_CLASSES
 
     let container = document.createElement('div')
     container.className = overlay
@@ -50,12 +57,28 @@ function buildOverlay(isLive = true) {
             let inputButtonsContainer = frameDoc.body.querySelector(
                 `.${chatInputButtonsContainer}`
             )
+            inputButtonsContainer.classList.add(overlayButtonsContainer)
             let buttons = buildOverlayButtons()
             inputButtonsContainer.prepend(buttons)
         }
         container.appendChild(frame)
-    }
+    } else {
+        elementReady(`.${vodChatListWrapper} ul`, document).then((el) => {
+            let wrapper = document.querySelector(`.${vodChatListWrapper}`)
+            let clone = wrapper.cloneNode(true)
+            clone.classList.add(overlayVodChat)
+            observeVodMessage(wrapper)
 
+            let inputButtonsContainer = document.createElement('div')
+            inputButtonsContainer.className = overlayButtonsContainer
+            let buttons = buildOverlayButtons()
+            inputButtonsContainer.appendChild(buttons)
+
+            container.appendChild(clone)
+            container.appendChild(inputButtonsContainer)
+        })
+        
+    }
     return container
 }
 
@@ -64,7 +87,7 @@ function buildOverlayButtons() {
     overlayButtons.style.display = 'flex'
     let buttons = []
 
-    let overlaySettingsEl = buildOverlaySettings()
+    let overlaySettingsEl = buildOverlaySettingsButton()
     let dragButtonEl = buildDragButton()
     buttons.push(overlaySettingsEl)
     buttons.push(dragButtonEl)
@@ -104,7 +127,7 @@ function buildDragButton() {
     return container
 }
 
-function buildOverlaySettings() {
+function buildOverlaySettingsButton() {
     const { coreButton, coreLabel } = TW_CLASSES.buttons
     const { settingsButton, settingsIcon, buttonContainer } = TC_CLASSES
 
@@ -184,7 +207,7 @@ function waitForVideo() {
         if (controls && chat) {
             let isLive = !!document.querySelector(`.${liveChat}`)
             let isVod = !!document.querySelector(`.${vodChat}`)
-
+            console.log('isVod: ' + isVod)
             if (isVod) {
                 init(false)
                 clearInterval(int)
@@ -199,7 +222,7 @@ function waitForVideo() {
 }
 
 window.onload = () => {
-    init()
+    waitForVideo()
     const { playerControls, liveChat, vodChat } = TW_CLASSES
     let location = window.location.pathname
 
