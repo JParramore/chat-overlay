@@ -1,0 +1,26 @@
+.tc-overlay {
+    height: 30%;
+    width: 30%;
+    position: absolute;
+    /* z-index: 2147483647; */
+    border: 2px solid pink;
+    border-radius: 5px;
+    resize: both;
+    overflow: auto;
+}
+
+.svg-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.svg-icon path,
+.svg-icon polygon,
+.svg-icon rect {
+    fill: #ffffff;
+}
+
+.svg-icon circle {
+    stroke: #ffffff;
+    stroke-width: 1;
+}

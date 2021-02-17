@@ -7,8 +7,13 @@
     "content_scripts": [
         {
             "matches": ["https://www.twitch.tv/*"],
-            "js": ["content.js"],
-            "css": ["styles.css"]
+            "js": ["helper.js", "content.js"],
+            "css": ["tc.css"]
+        },
+        {
+            "matches": ["https://www.twitch.tv/*/chat*"],
+            "css": ["frame.css"],
+            "all_frames": true
         }
     ],
     "manifest_version": 2

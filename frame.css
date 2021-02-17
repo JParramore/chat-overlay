@@ -1,0 +1,23 @@
+.channel-leaderboard,
+.community-points-summary,
+.stream-chat-header,
+.community-highlight-stack__backlog-card,
+.community-highlight-stack__scroll-area--disable {
+    display: none !important;
+}
+
+.chat-input__hide {
+    display: none !important;
+}
+
+html, body {
+    background-color: transparent !important;
+}
+
+.chat-room {
+    background-color: rgba(0, 212, 195, 0.25) !important;
+}
+
+.tc-button-container {
+    margin-right: 0.5rem;
+}

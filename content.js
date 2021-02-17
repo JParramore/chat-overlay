@@ -1,243 +1,215 @@
 console.log('script start')
 
-// function injectScript(file, node) {
-//     var th = document.getElementsByTagName(node)[0]
-//     var s = document.createElement('script')
-//     s.setAttribute('type', 'text/javascript')
-//     s.setAttribute('src', file)
-//     th.appendChild(s)
-// }
+function init(isLive = true) {
+    const { core } = TC_CLASSES
+    const { playerControls, videoPlayerOverlay } = TW_CLASSES
+    let coreComponents = []
 
-// injectScript(chrome.extension.getURL('/test.js'), 'body')
+    // Garbage collect extension components
+    document.querySelectorAll(`.${core}`).forEach((element) => element.remove())
+
+    let video = document.querySelector(`.${videoPlayerOverlay}`)
+    let overlayEl = buildOverlay()
+    video.appendChild(overlayEl)
+
+    let videoControls = document.querySelector(`.${playerControls}`)
+    let overlayButtonEl = buildToggleOverlayButton()
+    videoControls.prepend(overlayButtonEl)
+
+    coreComponents.push(overlayButtonEl)
+    coreComponents.push(overlayEl)
+
+    coreComponents.forEach((element) => element.classList.add(core))
+}
+
+function buildOverlay(isLive = true) {
+    const { overlay, chatFrame } = TC_CLASSES
+    const { toHide, display, chatInput, chatInputButtonsContainer } = TW_CLASSES
+
+    let container = document.createElement('div')
+    container.className = overlay
+    // container.style.display = 'none' // TODO: ON FOR PROD
+
+    if (isLive) {
+        const channel = window.location.pathname.substr(1)
+
+        let frame = document.createElement('iframe')
+        frame.className = chatFrame
+        frame.src = `https://www.twitch.tv/popout/${channel}/chat`
+        frame.height = '100%'
+        frame.width = '100%'
+        frame.onload = function () {
+            let frameDoc = this.contentWindow.document
+            toHide.forEach((className) => {
+                elementReady(`.${className}`, frameDoc).then((el) =>
+                    display.forEach((displayClass) =>
+                        el.classList.remove(displayClass)
+                    )
+                )
+            })
+            let inputButtonsContainer = frameDoc.body.querySelector(
+                `.${chatInputButtonsContainer}`
+            )
+            let buttons = buildOverlayButtons()
+            inputButtonsContainer.prepend(buttons)
+        }
+        container.appendChild(frame)
+    }
+
+    return container
+}
+
+function buildOverlayButtons() {
+    let overlayButtons = document.createElement('div')
+    overlayButtons.style.display = 'flex'
+    let buttons = []
+
+    let overlaySettingsEl = buildOverlaySettings()
+    let dragButtonEl = buildDragButton()
+    buttons.push(overlaySettingsEl)
+    buttons.push(dragButtonEl)
+
+    buttons.forEach((button) => overlayButtons.appendChild(button))
+
+    return overlayButtons
+}
+
+function buildDragButton() {
+    const { coreButton, coreLabel } = TW_CLASSES.buttons
+    const { dragButton, dragIcon, buttonContainer } = TC_CLASSES
+
+    let container = document.createElement('div')
+    container.className = buttonContainer
+
+    let stylesheet = document.createElement('link')
+    stylesheet.rel = 'stylesheet'
+    stylesheet.href =
+        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'
+
+    let button = document.createElement('button')
+    button.className = dragButton
+    coreButton.forEach((className) => button.classList.add(className))
+    button.onlick = () => {
+        console.log('draggin')
+    }
+
+    let icon = document.createElement('i')
+    dragIcon.forEach((className) => icon.classList.add(className))
+    coreLabel.forEach((className) => icon.classList.add(className))
+
+    button.appendChild(icon)
+    container.appendChild(stylesheet)
+    container.appendChild(button)
+
+    return container
+}
+
+function buildOverlaySettings() {
+    const { coreButton, coreLabel } = TW_CLASSES.buttons
+    const { settingsButton, settingsIcon, buttonContainer } = TC_CLASSES
+
+    let container = document.createElement('div')
+    container.className = buttonContainer
+
+    let stylesheet = document.createElement('link')
+    stylesheet.rel = 'stylesheet'
+    stylesheet.href =
+        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'
+
+    let button = document.createElement('button')
+    button.className = settingsButton
+    coreButton.forEach((className) => button.classList.add(className))
+    button.onclick = () => {
+        console.log('open settings button clicked')
+    }
+
+    let icon = document.createElement('i')
+    settingsIcon.forEach((className) => icon.classList.add(className))
+    coreLabel.forEach((className) => icon.classList.add(className))
+
+    button.appendChild(icon)
+    container.appendChild(stylesheet)
+    container.appendChild(button)
+
+    return container
+}
+
+function buildToggleOverlayButton() {
+    const { overlayButton, overlay, fadeOut } = TC_CLASSES
+    const twButtonClasses = TW_CLASSES.buttons.overlayButton
+
+    let container = document.createElement('div')
+    container.className = 'tw-tooltip__container tw-relative'
+    container.classList.add(overlayButton)
+
+    let button = document.createElement('button')
+    button.classList.add(...twButtonClasses)
+    button.ariaLabel = 'Chat Overlay'
+    button.onclick = () => {
+        let overlayEl = document.querySelector(`.${overlay}`)
+        const hidden =
+            !overlayEl.style.display || overlayEl.style.display === 'none'
+        if (hidden) {
+            overlayEl.style.display = 'flex'
+            // TODO flashFadeIn
+        } else {
+            overlayEl.style.display = 'none'
+        }
+    }
+
+    let tooltip = document.createElement('div')
+    tooltip.className = 'tw-tooltip tw-tooltip--align-right tw-tooltip--up'
+    tooltip.role = 'tooltip'
+    tooltip.innerHTML = 'Chat Overlay'
+
+    button.innerHTML = OVERLAY_BTN_SVG
+    container.appendChild(button)
+    container.appendChild(tooltip)
+
+    return container
+}
+
+function waitForVideo() {
+    const { playerControls, chatShell, liveChat, vodChat } = TW_CLASSES
+
+    const timeNow = Date.now()
+    const int = setInterval(() => {
+        if (Date.now() - timeNow > 10000) {
+            console.log('waitForVideo timed out')
+            clearInterval(int)
+        }
+        let controls = document.querySelector(`.${playerControls}`),
+            chat = document.querySelector(`.${chatShell}`)
+
+        if (controls && chat) {
+            let isLive = !!document.querySelector(`.${liveChat}`)
+            let isVod = !!document.querySelector(`.${vodChat}`)
+
+            if (isVod) {
+                init(false)
+                clearInterval(int)
+            } else if (isLive) {
+                init()
+                clearInterval(int)
+            } else {
+                console.log('controls and chat found but not live or vod?')
+            }
+        }
+    }, 500)
+}
 
 window.onload = () => {
-    //const datad = document.getElementById('video-data_oc')
-    //console.log(JSON.parse(datad.innerHTML))
+    init()
+    const { playerControls, liveChat, vodChat } = TW_CLASSES
+    let location = window.location.pathname
 
-    // let data,
-    //     vodID,
-    //     channelName,
-    //     pathname = window.location.pathname.substr(1)
-    // playerType = 'site'
-
-    // pathname.startsWith('videos/')
-    //     ? (vodID = (vodID = pathname
-    //           .replace('videos/', '')
-    //           .replace(/\//g, '')).startsWith('v')
-    //           ? vodID.substr(1)
-    //           : vodID)
-    //     : (channelName = pathname.replace(/\//g, ''))
-    // if (vodID) {
-    //     var body = {
-    //         variables: {
-    //             isLive: !1,
-    //             login: '',
-    //             isVod: !0,
-    //             vodID: vodID,
-    //             playerType: playerType,
-    //         },
-    //     }
-
-    //     data = {
-    //         contentType: 'vod',
-    //         id: vodID,
-    //         playerType: playerType,
-    //         variables: body,
-    //     }
-    // } else if (channelName) {
-    //     body = {
-    //         variables: {
-    //             isLive: !0,
-    //             login: channelName,
-    //             isVod: !1,
-    //             vodID: '',
-    //             playerType: playerType,
-    //         },
-    //     }
-
-    //     data = {
-    //         contentType: 'live',
-    //         id: channelName,
-    //         playerType: playerType,
-    //         variables: body,
-    //     }
-    // }
-
-    try {
-        var defaultSpadeEndpoint = 'https://spade.twitch.tv/track'
-        window.__twilightBuildID = '91e7c322-9d43-4ddf-8035-edf98b31c86a'
-        for (
-            var entries = document.cookie.split('; '),
-                cookies = {},
-                i = entries.length - 1;
-            0 <= i;
-            i--
-        ) {
-            var entry = entries[i].split('=', 2)
-            cookies[entry[0]] = entry[1]
+    setInterval(() => {
+        if (location !== window.location.pathname) {
+            console.log('location changed')
+            location = window.location.pathname
+            waitForVideo()
         }
-        function fetchlike(a) {
-            return 'function' == typeof fetch
-                ? fetch('https://gql.twitch.tv/gql', a)
-                : new Promise(function (e, t) {
-                      var o = new XMLHttpRequest()
-                      o.open('POST', 'https://gql.twitch.tv/gql'),
-                          Object.keys(a.headers).forEach(function (e) {
-                              try {
-                                  o.setRequestHeader(e, a.headers[e])
-                              } catch (e) {
-                                  console.error(e)
-                              }
-                          }),
-                          (o.withCredentials = 'include' === a.credentials),
-                          (o.onerror = t),
-                          (o.onload = function () {
-                              var a = {
-                                  status: o.status,
-                                  statusText: o.statusText,
-                                  body: o.response || o.responseText,
-                                  ok: 200 <= o.status && o.status < 300,
-                                  json: function () {
-                                      return new Promise(function (e, t) {
-                                          try {
-                                              e(JSON.parse(a.body))
-                                          } catch (e) {
-                                              t(e)
-                                          }
-                                      })
-                                  },
-                              }
-                              e(a)
-                          }),
-                          o.send(a.body)
-                  })
-        }
-        var datatest,
-            vodID,
-            channelName,
-            playerType = 'site',
-            authorization = cookies['auth-token']
-                ? 'OAuth ' + cookies['auth-token']
-                : void 0,
-            commonOptions = {
-                method: 'POST',
-                headers: {
-                    'Accept-Language': 'en-US',
-                    Accept: '*/*',
-                    Authorization: authorization,
-                    'Client-ID': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
-                    'Content-Type': 'text/plain; charset=UTF-8',
-                    'Device-ID': cookies.unique_id,
-                },
-            },
-            playerRoutesExact =
-                (window.__twilightSettings &&
-                    window.__twilightSettings.player_routes_exact) ||
-                [],
-            playerRoutesStartsWith =
-                (window.__twilightSettings &&
-                    window.__twilightSettings.player_routes_startswith) ||
-                [],
-            pathname = window.location.pathname.substr(1)
-        ;-1 === playerRoutesExact.indexOf(pathname) &&
-            0 ===
-                playerRoutesStartsWith.filter(function (e) {
-                    return pathname.startsWith(e)
-                }).length &&
-            (pathname.startsWith('videos/')
-                ? (vodID = (vodID = pathname
-                      .replace('videos/', '')
-                      .replace(/\//g, '')).startsWith('v')
-                      ? vodID.substr(1)
-                      : vodID)
-                : (channelName = pathname.replace(/\//g, '')))
-        var query =
-                'query PlaybackAccessToken_Template($login: String!, $isLive: Boolean!, $vodID: ID!, $isVod: Boolean!, $playerType: String!) {  streamPlaybackAccessToken(channelName: $login, params: {platform: "web", playerBackend: "mediaplayer", playerType: $playerType}) @include(if: $isLive) {    value    signature    __typename  }  videoPlaybackAccessToken(id: $vodID, params: {platform: "web", playerBackend: "mediaplayer", playerType: $playerType}) @include(if: $isVod) {    value    signature    __typename  }}',
-            bodyBase = {
-                operationName: 'PlaybackAccessToken_Template',
-                query: query,
-            }
-        if (vodID) {
-            var body = JSON.stringify(
-                Object.assign({}, bodyBase, {
-                    variables: {
-                        isLive: !1,
-                        login: '',
-                        isVod: !0,
-                        vodID: vodID,
-                        playerType: playerType,
-                    },
-                })
-            )
-            datatest = {
-                contentType: 'vod',
-                id: vodID,
-                playerType: playerType,
-                request: fetchlike(
-                    Object.assign({}, commonOptions, { body: body })
-                ),
-            }
-        } else if (channelName) {
-            body = JSON.stringify(
-                Object.assign({}, bodyBase, {
-                    variables: {
-                        isLive: !0,
-                        login: channelName,
-                        isVod: !1,
-                        vodID: '',
-                        playerType: playerType,
-                    },
-                })
-            )
-            datatest = {
-                contentType: 'live',
-                id: channelName,
-                playerType: playerType,
-                request: fetchlike(
-                    Object.assign({}, commonOptions, { body: body })
-                ),
-            }
-        }
-        var blob = new Blob(
-                [
-                    'data=' +
-                        encodeURIComponent(
-                            btoa(
-                                JSON.stringify({
-                                    event: 'benchmark_template_loaded',
-                                    properties: {
-                                        app_version: window.__twilightBuildID,
-                                        benchmark_server_id:
-                                            cookies.server_session_id,
-                                        client_time: Date.now() / 1e3,
-                                        device_id: cookies.unique_id,
-                                        duration: Math.round(performance.now()),
-                                        url:
-                                            location.protocol +
-                                            '//' +
-                                            location.hostname +
-                                            location.pathname +
-                                            location.search,
-                                    },
-                                })
-                            )
-                        ),
-                ],
-                { type: 'application/x-www-form-urlencoded; charset=UTF-8' }
-            ),
-            req = new XMLHttpRequest()
-        req.open(
-            'POST',
-            (window.__twilightSettings && window.__twilightSettings.spade_url) ||
-                defaultSpadeEndpoint,
-            !0
-        ),
-            req.send(blob)
-    } catch (e) {
-        console.error('Error in bootstrap script:', e)
-    }
-    
-
-   console.log(datatest)
+    }, 500)
 }
+
 console.log('script end')
