@@ -6,12 +6,12 @@ const TC_CLASSES = {
     overlayVodChat: 'tc-overlay-vod-chat',
     overlayButtonsContainer: 'tc-buttons-container',
     overlayButton: 'tc-overlay-button',
-    buttonContainer: 'tc-button-container',
+    buttonWrapper: 'tc-button-wrapper',
     settingsButton: 'tc-settings-button',
     settingsIcon: ['fas', 'fa-cog'],
     dragButton: 'tc-drag-button',
     dragIcon: ['fa', 'fa-arrows-alt'],
-    frame: 'tc-chat-frame',
+    overlayFrame: 'tc-chat-frame',
     fadeOut: 'tc-fade-out',
 }
 
@@ -96,7 +96,6 @@ chrome.storage.sync.get(['overlaySettings'], function (result) {
     } else {
         settings = result.overlaySettings
     }
-    document.body.overlaySettings = settings
 })
 
 // Wait until element exists then resolve on element https://gist.github.com/jwilson8767/db379026efcbd932f64382db4b02853e
@@ -140,11 +139,86 @@ const observeVodMessage = (twMessageWrapper) => {
     observer.observe(twMessageWrapper, config)
 }
 
-globalThis.overlay = {
-    TW_CLASSES,
-    TC_CLASSES,
-    OVERLAY_BTN_SVG,
-    settings,
-    elementReady,
-    observeVodMessage,
+const setDraggable = (draggable, container, frame) => {
+    let fsElement = document.querySelector('.video-player__overlay')
+    let videoPlayerHeight = null,
+        videoPlayerWidth = null
+
+    var pos1 = 0,
+        pos2 = 0,
+        pos3 = 0,
+        pos4 = 0
+    draggable.onmousedown = dragMouseDown
+
+    function dragMouseDown(e) {
+        videoPlayerHeight = fsElement.offsetHeight
+        videoPlayerWidth = fsElement.offsetWidth
+
+        e = e || window.event
+        e.preventDefault()
+        // get the mouse cursor position at startup:
+        pos3 = e.clientX
+        pos4 = e.clientY
+        document.onmouseup = closeDragElement
+        // call a function whenever the cursor moves:
+        document.onmousemove = elementDrag
+        if (frame) {
+            //frame.onmousemove = elementDrag
+            frame.onmouseup = closeDragElement
+        }
+    }
+
+    function elementDrag(e) {
+        e = e || window.event
+        e.preventDefault()
+        // calculate the new cursor:
+        pos1 = pos3 - e.clientX
+        pos2 = pos4 - e.clientY
+        pos3 = e.clientX
+        pos4 = e.clientY
+
+        // set the element's new position:
+        let offsetTop = container.offsetTop - pos2
+        let offsetLeft = container.offsetLeft - pos1
+        container.style.top = offsetTop + 'px'
+        container.style.left = offsetLeft + 'px'
+
+        if (container.offsetTop < 0) {
+            container.style.top = '0px'
+        }
+        if (container.offsetLeft < 0) {
+            container.style.left = '0px'
+        }
+        if (container.offsetTop + container.offsetHeight > videoPlayerHeight) {
+            container.style.top = `${
+                videoPlayerHeight - container.offsetHeight
+            }px`
+        }
+        if (container.offsetLeft + container.offsetWidth > videoPlayerWidth) {
+            container.style.left = `${
+                videoPlayerWidth - container.offsetWidth
+            }px`
+        }
+    }
+
+    function closeDragElement() {
+        // stop moving when mouse button is released:
+        document.onmouseup = null
+        document.onmousemove = null
+
+        if (frame) {
+            //frame.onmousemove = null
+            frame.onmouseup = null
+        }
+    }
 }
+
+// globalThis.overlay = {
+//     TW_CLASSES,
+//     TC_CLASSES,
+//     OVERLAY_BTN_SVG,
+//     settings,
+//     elementReady,
+//     observeVodMessage,
+//     setDraggable
+// }

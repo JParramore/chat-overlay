@@ -10,7 +10,8 @@
     display: none !important;
 }
 
-html, body {
+html,
+body {
     background-color: transparent !important;
 }
 
@@ -18,6 +19,6 @@ html, body {
     background-color: rgba(0, 212, 195, 0.25) !important;
 }
 
-.tc-button-container {
+.tc-button-wrapper {
     margin-right: 0.5rem;
 }

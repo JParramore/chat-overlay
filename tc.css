@@ -1,15 +1,17 @@
 .tc-overlay {
-    height: 30%;
-    width: 30%;
+    height: 50%;
+    width: 50%;
     position: absolute;
-    /* z-index: 2147483647; */
+    z-index: 2147483647;
     border: 2px solid pink;
     border-radius: 5px;
     resize: both;
-    /* overflow: hidden; */
+    flex-direction: column;
+    overflow: hidden;
 }
 
-.tc-drag-button, .tc-settings-button {
+.tc-drag-button,
+.tc-settings-button {
     display: inline-flex;
     position: relative;
     -webkit-box-align: center;
@@ -29,7 +31,13 @@
     color: var(--color-text-button-primary);
 }
 
-.tc-button-container {
+.tc-buttons-container {
+    position: absolute;
+    bottom: 0;
+    padding: 1rem;
+}
+
+.tc-button-wrapper {
     margin-right: 0.5rem;
 }
 
