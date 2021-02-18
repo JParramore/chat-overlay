@@ -278,6 +278,51 @@ const setDraggable = (draggable, container, frame) => {
     }
 }
 
+
+const animateShowComponent = (ElSelector, offsetElSelector) => {
+    var elem = document.querySelector(ElSelector)
+    let offset = document.querySelector(offsetElSelector).offsetHeight
+    let isOpen
+    
+    if (elem.classList.contains('tc-open')){
+        isOpen = true
+        elem.classList.remove('tc-open')
+        elem.classList.add('tc-closed')
+    } else {
+        isOpen = false    
+        elem.classList.remove('tc-closed')
+        elem.classList.add('tc-open')
+    }
+
+    var pos = 0
+    let start = elem.offsetTop
+    var id = setInterval(frame, 10)
+    let moveDistance = offset
+    function frame() {
+        if (pos >= moveDistance) {
+            clearInterval(id)
+        } else {
+            pos += 10
+            elem.style.top = isOpen ? `${start + pos}px` : `${start - pos}px`
+        }
+    }
+}
+
+
+// https://stackoverflow.com/a/59093093/14549357
+const getNodeHeight = (node) => {
+    var height, clone = node.cloneNode(true)
+    // hide the meassured (cloned) element
+    clone.style.cssText = "position:fixed; top:-9999px; opacity:0;"
+    // add the clone to the DOM 
+    document.body.appendChild(clone)
+    // meassure it
+    height = clone.clientHeight
+    // cleaup 
+    clone.parentNode.removeChild(clone)
+    return height
+}
+
 // globalThis.overlay = {
 //     TW_CLASSES,
 //     TC_CLASSES,

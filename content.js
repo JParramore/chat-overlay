@@ -75,14 +75,19 @@ function buildOverlay() {
 
     let settingsContainerEl = document.createElement('div')
     settingsContainerEl.className = settingsContainer
+    
     let buttons = buildOverlayButtons()
     let settingsEl = buildOverlaySettings()
+    settingsContainerEl.style.bottom = `-${getNodeHeight(settingsEl)}px`
+
     settingsContainerEl.appendChild(buttons)
     settingsContainerEl.appendChild(settingsEl)
     container.appendChild(settingsContainerEl)
 
     return container
 }
+
+
 
 function buildOverlaySettings() {
     const { settingsWrapper } = TC_CLASSES
@@ -225,7 +230,7 @@ function buildDragButton() {
 
 function buildOverlaySettingsButton() {
     const { coreButton, coreLabel } = TW_CLASSES.buttons
-    const { settingsButton, settingsIcon, buttonWrapper } = TC_CLASSES
+    const { settingsButton, settingsIcon, buttonWrapper, settingsContainer, settingsWrapper } = TC_CLASSES
 
     let container = document.createElement('div')
     container.className = buttonWrapper
@@ -240,6 +245,7 @@ function buildOverlaySettingsButton() {
     coreButton.forEach((className) => button.classList.add(className))
     button.onclick = () => {
         console.log('open settings button clicked')
+        animateShowComponent(`.${settingsContainer}`,`.${settingsWrapper}`)
     }
 
     let icon = document.createElement('i')
