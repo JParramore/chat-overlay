@@ -110,7 +110,7 @@ const settingsElements = {
             min: 8,
             max: 30,
             value: DEFAULT_SETTINGS.chat.fontSize,
-            input: () => {
+            input: function () {
                 console.log(
                     `change font size to ${this.value} and update settings`
                 )
@@ -121,7 +121,7 @@ const settingsElements = {
             min: 0,
             max: 100,
             valus: DEFAULT_SETTINGS.theme.alpha * 100,
-            input: () => {
+            input: function () {
                 console.log(
                     `change bg opacity to ${
                         this.value / 100
@@ -134,7 +134,7 @@ const settingsElements = {
             min: 0,
             max: 100,
             valus: DEFAULT_SETTINGS.chat.opacity * 100,
-            input: () => {
+            input: function () {
                 console.log(
                     `change chat opacity to ${
                         this.value / 100
@@ -148,7 +148,7 @@ const settingsElements = {
             label: 'Chunky Chat',
             checked: DEFAULT_SETTINGS.chat.bold,
             id: 'over-chat-settings-embolden',
-            onchange: () => {
+            onchange: function () {
                 console.log(`toggle bold chat ${this.checked}`)
             },
         },
@@ -156,11 +156,11 @@ const settingsElements = {
             label: 'Dark Mode',
             checked: DEFAULT_SETTINGS.darkMode,
             id: 'over-chat-settings-dark-mode',
-            onchange: () => {
+            onchange: function () {
                 console.log(`toggle darkmode ${this.checked}`)
             },
-        }
-    ]
+        },
+    ],
 }
 
 // Wait until element exists then resolve on element https://gist.github.com/jwilson8767/db379026efcbd932f64382db4b02853e

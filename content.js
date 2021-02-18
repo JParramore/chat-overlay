@@ -87,9 +87,13 @@ function buildOverlay() {
 function buildOverlaySettings() {
     const { settingsWrapper } = TC_CLASSES
 
+    let container = document.createElement('div')
+    container.style.paddingTop = '0.5rem'
+    
     let wrapper = document.createElement('div')
     wrapper.className = settingsWrapper
-    wrapper.style.backgroundColor = 'navy'
+
+    container.appendChild(wrapper)
 
     settingsElements.sliders.forEach((el) => {
         const { label, min, max, value, input } = el
@@ -103,11 +107,14 @@ function buildOverlaySettings() {
         wrapper.appendChild(toggle)
     })
 
-    return wrapper
+    return container
 }
 
 function buildToggleSetting(text, checked, id, onchange) {
     let container = document.createElement('div')
+    container.style.display = 'flex'
+    container.style.justifyContent = 'space-between'
+
 
     let twToggle = document.createElement('div')
     twToggle.className = 'tw-toggle'
@@ -124,7 +131,7 @@ function buildToggleSetting(text, checked, id, onchange) {
     input.onchange = onchange
 
     let label = document.createElement('label')
-    label.className = 'tw-toggle_button'
+    label.className = 'tw-toggle__button'
     label.setAttribute('for', id)
 
     twToggle.appendChild(input)

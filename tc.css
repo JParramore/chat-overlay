@@ -41,10 +41,14 @@
     color: var(--color-text-button-primary);
 }
 
-.tc-buttons-container {
+.tc-settings-container {
     position: absolute;
-    bottom: 0;
     padding: 1rem;
+    top: 0;
+}
+
+.tc-buttons-container {
+
 }
 
 .tc-button-wrapper {
@@ -52,8 +56,7 @@
 }
 
 .tc-settings-wrapper {
-    position: absolute;
-    top: 0
+    background-color: navy;
 }
 
 .svg-icon {
