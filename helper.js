@@ -9,6 +9,8 @@ const TC_CLASSES = {
     buttonWrapper: 'tc-button-wrapper',
     settingsButton: 'tc-settings-button',
     settingsIcon: ['fas', 'fa-cog'],
+    settingsContainer: 'tc-settings-container',
+    settingsWrapper: 'tc-settings-wrapper',
     dragButton: 'tc-drag-button',
     dragIcon: ['fa', 'fa-arrows-alt'],
     overlayFrame: 'tc-chat-frame',
@@ -28,13 +30,15 @@ const TW_CLASSES = {
     display: ['tw-flex', 'tw-block', 'tw-inline-flex'],
     buttons: {
         coreButton: [
-            'jeBpig',
-            'tw-core-button',
             'tw-core-button--primary',
             'tw-border-bottom-left-radius-medium',
             'tw-border-bottom-right-radius-medium',
             'tw-border-top-left-radius-medium',
             'tw-border-top-right-radius-medium',
+            'jeBpig',
+            'tw-core-button',
+            'ScCoreButton-sc-1qn4ixc-0',
+            'ScCoreButtonPrimary-sc-1qn4ixc-1',
         ],
         coreLabel: ['tw-core-button-label', 'xsINH'],
         overlayButton: [
@@ -91,12 +95,73 @@ const DEFAULT_SETTINGS = {
 }
 
 chrome.storage.sync.get(['overlaySettings'], function (result) {
+    console.log('storage GET ' + JSON.stringify(result.overlaySettings))
     if (result && Object.keys(result).length === 0) {
         settings = DEFAULT_SETTINGS
     } else {
         settings = result.overlaySettings
     }
 })
+
+const settingsElements = {
+    sliders: [
+        {
+            label: 'Font Size',
+            min: 8,
+            max: 30,
+            value: DEFAULT_SETTINGS.chat.fontSize,
+            input: () => {
+                console.log(
+                    `change font size to ${this.value} and update settings`
+                )
+            },
+        },
+        {
+            label: 'BG Opacity',
+            min: 0,
+            max: 100,
+            valus: DEFAULT_SETTINGS.theme.alpha * 100,
+            input: () => {
+                console.log(
+                    `change bg opacity to ${
+                        this.value / 100
+                    } and update settings`
+                )
+            },
+        },
+        {
+            label: 'Chat Opacity',
+            min: 0,
+            max: 100,
+            valus: DEFAULT_SETTINGS.chat.opacity * 100,
+            input: () => {
+                console.log(
+                    `change chat opacity to ${
+                        this.value / 100
+                    } and update settings`
+                )
+            },
+        },
+    ],
+    toggles: [
+        {
+            label: 'Chunky Chat',
+            checked: DEFAULT_SETTINGS.chat.bold,
+            id: 'over-chat-settings-embolden',
+            onchange: () => {
+                console.log(`toggle bold chat ${this.checked}`)
+            },
+        },
+        {
+            label: 'Dark Mode',
+            checked: DEFAULT_SETTINGS.darkMode,
+            id: 'over-chat-settings-dark-mode',
+            onchange: () => {
+                console.log(`toggle darkmode ${this.checked}`)
+            },
+        }
+    ]
+}
 
 // Wait until element exists then resolve on element https://gist.github.com/jwilson8767/db379026efcbd932f64382db4b02853e
 const elementReady = (selector, doc) => {

@@ -31,6 +31,16 @@
     color: var(--color-text-button-primary);
 }
 
+.tc-drag-button:hover {
+    background-color: var(--color-background-button-primary-hover);
+    color: var(--color-text-button-primary);
+}
+
+.tc-settings-button:hover {
+    background-color: var(--color-background-button-primary-hover);
+    color: var(--color-text-button-primary);
+}
+
 .tc-buttons-container {
     position: absolute;
     bottom: 0;
@@ -39,6 +49,11 @@
 
 .tc-button-wrapper {
     margin-right: 0.5rem;
+}
+
+.tc-settings-wrapper {
+    position: absolute;
+    top: 0
 }
 
 .svg-icon {

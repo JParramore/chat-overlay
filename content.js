@@ -30,7 +30,7 @@ function buildOverlay() {
         overlay,
         overlayFrame,
         overlayVodChat,
-        overlayButtonsContainer,
+        settingsContainer,
     } = TC_CLASSES
     const {
         toHide,
@@ -73,17 +73,94 @@ function buildOverlay() {
         })
     }
 
-    let inputButtonsContainer = document.createElement('div')
-    inputButtonsContainer.className = overlayButtonsContainer
+    let settingsContainerEl = document.createElement('div')
+    settingsContainerEl.className = settingsContainer
     let buttons = buildOverlayButtons()
-    inputButtonsContainer.appendChild(buttons)
-    container.appendChild(inputButtonsContainer)
+    let settingsEl = buildOverlaySettings()
+    settingsContainerEl.appendChild(buttons)
+    settingsContainerEl.appendChild(settingsEl)
+    container.appendChild(settingsContainerEl)
+
+    return container
+}
+
+function buildOverlaySettings() {
+    const { settingsWrapper } = TC_CLASSES
+
+    let wrapper = document.createElement('div')
+    wrapper.className = settingsWrapper
+    wrapper.style.backgroundColor = 'navy'
+
+    settingsElements.sliders.forEach((el) => {
+        const { label, min, max, value, input } = el
+        const slider = buildSliderSetting(label, min, max, value, input)
+        wrapper.appendChild(slider)
+    })
+
+    settingsElements.toggles.forEach((el) => {
+        const { label, checked, id, onchange } = el
+        const toggle = buildToggleSetting(label, checked, id, onchange)
+        wrapper.appendChild(toggle)
+    })
+
+    return wrapper
+}
+
+function buildToggleSetting(text, checked, id, onchange) {
+    let container = document.createElement('div')
+
+    let twToggle = document.createElement('div')
+    twToggle.className = 'tw-toggle'
+
+    let textEl = document.createElement('div')
+    textEl.innerHTML = text
+
+    let input = document.createElement('input')
+    input.type = 'checkbox'
+    input.checked = checked
+    input.className = 'tw-toggle__input'
+    input.id = id
+    input.setAttribute('data-a-target', 'tw-toggle')
+    input.onchange = onchange
+
+    let label = document.createElement('label')
+    label.className = 'tw-toggle_button'
+    label.setAttribute('for', id)
+
+    twToggle.appendChild(input)
+    twToggle.appendChild(label)
+
+    container.appendChild(textEl)
+    container.appendChild(twToggle)
+
+    return container
+}
+
+function buildSliderSetting(text, min, max, value, input) {
+    let container = document.createElement('div')
+
+    let label = document.createElement('div')
+    label.innerHTML = text
+
+    slider = document.createElement('input')
+    slider.type = 'range'
+    slider.min = min
+    slider.max = max
+    slider.value = value
+    slider.className = 'alpha-slider slider'
+    slider.oninput = input
+
+    container.appendChild(label)
+    container.appendChild(slider)
 
     return container
 }
 
 function buildOverlayButtons() {
+    const { overlayButtonsContainer } = TC_CLASSES
+
     let overlayButtons = document.createElement('div')
+    overlayButtons.className = overlayButtonsContainer
     overlayButtons.style.display = 'flex'
     let buttons = []
 
@@ -118,6 +195,7 @@ function buildDragButton() {
     let button = document.createElement('button')
     button.className = dragButton
     coreButton.forEach((className) => button.classList.add(className))
+    button.style.cursor = 'move'
 
     let icon = document.createElement('i')
     dragIcon.forEach((className) => icon.classList.add(className))
