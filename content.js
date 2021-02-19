@@ -7,7 +7,6 @@ function init() {
 
     // Garbage collect extension components
     document.querySelectorAll(`.${core}`).forEach((element) => element.remove())
-    document.querySelectorAll(`${core}`).forEach((el)=> console.log(el))
 
     let video = document.querySelector(`.${videoPlayerOverlay}`)
     let overlayEl = buildOverlay()
@@ -16,6 +15,7 @@ function init() {
     let videoControls = document.querySelector(`.${playerControls}`)
     let overlayButtonEl = buildToggleOverlayButton()
     videoControls.prepend(overlayButtonEl)
+    observeElementRemoved('tc-overlay-button')
 
     coreComponents.push(overlayButtonEl)
     coreComponents.push(overlayEl)
@@ -38,7 +38,7 @@ function buildOverlay() {
 
     if (isLive) {
         const channel = window.location.pathname.substr(1)
-
+        
         let frame = document.createElement('iframe')
         frame.className = overlayFrame
         frame.src = `https://www.twitch.tv/popout/${channel}/chat`
@@ -267,7 +267,8 @@ function buildOverlaySettingsButton() {
     button.className = settingsButton
     coreButton.forEach((className) => button.classList.add(className))
     button.onclick = () => {
-        animateShowComponent(`.${settingsContainer}`, `.${settingsWrapper}`)
+        document.querySelector(`.${settingsWrapper}`).parentElement.className = 'tc-wrapper-1rem'
+        animateShowComponent(`.${settingsContainer}`, `.tc-wrapper-1rem`)
     }
 
     let icon = document.createElement('i')
@@ -282,7 +283,7 @@ function buildOverlaySettingsButton() {
 }
 
 function buildToggleOverlayButton() {
-    const { overlayButton, overlay, fadeOut } = TC_CLASSES
+    const { overlayButton, overlay } = TC_CLASSES
     const twButtonClasses = TW_CLASSES.buttons.overlayButton
 
     let container = document.createElement('div')
@@ -350,8 +351,8 @@ function addOverlayFunctions(overlay, buttons, frame) {
     overlay.onmouseout = () => {
         overlay.style.border = '2px solid transparent'
         overlay.style.resize = 'none'
-        buttons.style.visibility = 'hidden'
-        if (input) input.classList.add('chat-input__hide')
+        //buttons.style.visibility = 'hidden'
+        //if (input) input.classList.add('chat-input__hide')
     }
 }
 
@@ -401,10 +402,6 @@ function updateThemeStyles() {
 }
 
 function updateChatStyles() {
-    chrome.storage.sync.set({ overlaySettings: settings }, function () {
-        console.log('settings saved', settings)
-    })
-
     let chat
 
     if (isLive) {

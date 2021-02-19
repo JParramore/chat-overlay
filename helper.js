@@ -187,16 +187,14 @@ const elementReady = (selector, doc) => {
     })
 }
 
-
 const observeVodMessage = (twMessageWrapper) => {
     let pathname = window.location.pathname
     let countLines = 0
     observer = new MutationObserver(function (mutationsList, observer) {
         for (const mutation of mutationsList) {
             mutation.addedNodes.forEach((node) => {
-                if (window.location.pathname !== pathname ) observer.disconnect()
+                if (window.location.pathname !== pathname) observer.disconnect()
                 if (node.matches(`li[class="tw-full-width`)) {
-
                     let listContainer = document.querySelector(
                         `.${TC_CLASSES.overlayVodChat} ul`
                     )
@@ -207,14 +205,35 @@ const observeVodMessage = (twMessageWrapper) => {
                     listContainer.appendChild(clone)
                     countLines += 1
 
-                    let tcChat = document.querySelector(`.${TW_CLASSES.overlayVodChat}`)
-                    if (tcChat && tcChat.scrollHeight) tcChat.scrollTop = tcChat.scrollHeight
+                    let tcChat = document.querySelector(
+                        `.${TW_CLASSES.overlayVodChat}`
+                    )
+                    if (tcChat && tcChat.scrollHeight)
+                        tcChat.scrollTop = tcChat.scrollHeight
                 }
             })
         }
     })
     const config = { childList: true, subtree: true }
     observer.observe(twMessageWrapper, config)
+}
+
+const observeElementRemoved = (targetSel) => {
+    let target = document.querySelector(`.${targetSel}`)
+
+    observer = new MutationObserver(function (mutationsList, observer) {
+        if (!document.body.contains(target)) {
+            console.log('target gone missing')
+            observer.disconnect()
+            elementReady(`.${TW_CLASSES.playerControls}`, document).then(
+                (el) => {
+                    waitForVideo()
+                }
+            )
+        }
+    })
+    const config = { childList: true, subtree: true }
+    observer.observe(document, config)
 }
 
 const setDraggable = (draggable, container, frame) => {
@@ -295,6 +314,7 @@ const animateShowComponent = (ElSelector, offsetElSelector) => {
     var elem = document.querySelector(ElSelector)
     let offset = document.querySelector(offsetElSelector).offsetHeight
     let isOpen
+    console.log(offset)
 
     if (elem.classList.contains('tc-open')) {
         isOpen = true

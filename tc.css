@@ -63,12 +63,13 @@
     position: absolute;
     padding-left: 1rem;
     padding-bottom: 1rem;
-    top: calc(-35px - 1rem);
+    top: -45px;
     visibility: hidden;
 }
 
 .tc-setting {
     display: flex;
+    font-weight: bold;
     justify-content: space-between;
 }
 
@@ -96,7 +97,7 @@
 .tc-settings-wrapper {
     background-color: rgb(31,31,35);
     border-radius: 5px;
-    padding: 1rem;
+    padding: 0.5rem 1rem 0.5rem 1rem;
 }
 
 .svg-icon {
