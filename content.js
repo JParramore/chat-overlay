@@ -1,5 +1,3 @@
-console.log('script start')
-
 let isLive = true
 
 function init() {
@@ -11,7 +9,6 @@ function init() {
     document.querySelectorAll(`.${core}`).forEach((element) => element.remove())
 
     let video = document.querySelector(`.${videoPlayerOverlay}`)
-    console.log('is live ' + isLive)
     let overlayEl = buildOverlay()
     video.appendChild(overlayEl)
 
@@ -61,6 +58,9 @@ function buildOverlay() {
                     )
                 )
             })
+            elementReady(`.${settingsContainer}`, document).then((el) =>
+                updateAllSettings()
+            )
         }
         container.prepend(frame)
     } else {
@@ -73,41 +73,51 @@ function buildOverlay() {
         })
     }
 
+    let relativeWrapper = document.createElement('div')
+    relativeWrapper.style.width = '100%'
+    relativeWrapper.style.position = 'relative'
+
     let settingsContainerEl = document.createElement('div')
     settingsContainerEl.className = settingsContainer
-    
+
     let buttons = buildOverlayButtons()
     let settingsEl = buildOverlaySettings()
-    settingsContainerEl.style.bottom = `-${getNodeHeight(settingsEl)}px`
 
     settingsContainerEl.appendChild(buttons)
     settingsContainerEl.appendChild(settingsEl)
-    container.appendChild(settingsContainerEl)
+    relativeWrapper.appendChild(settingsContainerEl)
+    container.appendChild(relativeWrapper)
+
+    if (!isLive)
+        elementReady(`.${overlayVodChat}`, document).then((el) =>
+            updateAllSettings()
+        )
 
     return container
 }
-
-
 
 function buildOverlaySettings() {
     const { settingsWrapper } = TC_CLASSES
 
     let container = document.createElement('div')
-    container.style.paddingTop = '0.5rem'
-    
+    container.style.paddingTop = '1rem'
+
     let wrapper = document.createElement('div')
     wrapper.className = settingsWrapper
 
     container.appendChild(wrapper)
 
-    settingsElements.sliders.forEach((el) => {
-        const { label, min, max, value, input } = el
+    const sliders = Object.keys(settingsElements.sliders)
+    const toggles = Object.keys(settingsElements.toggles)
+
+    sliders.forEach((el) => {
+        const { label, min, max, value, input } = settingsElements.sliders[el]
         const slider = buildSliderSetting(label, min, max, value, input)
         wrapper.appendChild(slider)
     })
 
-    settingsElements.toggles.forEach((el) => {
-        const { label, checked, id, onchange } = el
+    toggles.forEach((el) => {
+        const { label, checked, id, onchange } = settingsElements.toggles[el]
         const toggle = buildToggleSetting(label, checked, id, onchange)
         wrapper.appendChild(toggle)
     })
@@ -119,7 +129,6 @@ function buildToggleSetting(text, checked, id, onchange) {
     let container = document.createElement('div')
     container.style.display = 'flex'
     container.style.justifyContent = 'space-between'
-
 
     let twToggle = document.createElement('div')
     twToggle.className = 'tw-toggle'
@@ -230,7 +239,13 @@ function buildDragButton() {
 
 function buildOverlaySettingsButton() {
     const { coreButton, coreLabel } = TW_CLASSES.buttons
-    const { settingsButton, settingsIcon, buttonWrapper, settingsContainer, settingsWrapper } = TC_CLASSES
+    const {
+        settingsButton,
+        settingsIcon,
+        buttonWrapper,
+        settingsContainer,
+        settingsWrapper,
+    } = TC_CLASSES
 
     let container = document.createElement('div')
     container.className = buttonWrapper
@@ -244,8 +259,7 @@ function buildOverlaySettingsButton() {
     button.className = settingsButton
     coreButton.forEach((className) => button.classList.add(className))
     button.onclick = () => {
-        console.log('open settings button clicked')
-        animateShowComponent(`.${settingsContainer}`,`.${settingsWrapper}`)
+        animateShowComponent(`.${settingsContainer}`, `.${settingsWrapper}`)
     }
 
     let icon = document.createElement('i')
@@ -294,6 +308,23 @@ function buildToggleOverlayButton() {
     return container
 }
 
+const updateSetting = (type, setting, value) => {
+    settingsElements[type][setting].update(value)
+
+    chrome.storage.sync.set({ 'overlaySettings': settings }, function () {})
+}
+
+function updateAllSettings() {
+    Object.keys(settingsElements).forEach((settingType) =>
+        Object.keys(settingsElements[settingType]).forEach((settingName) => {
+            const { type, name, value, checked } = settingsElements[
+                settingType
+            ][settingName]
+            updateSetting(type, name, value || checked)
+        })
+    )
+}
+
 function waitForVideo() {
     const { playerControls, chatShell, liveChat, vodChat } = TW_CLASSES
 
@@ -323,9 +354,7 @@ function waitForVideo() {
     }, 500)
 }
 
-window.onload = () => {
-    waitForVideo()
-    const { playerControls, liveChat, vodChat } = TW_CLASSES
+function listenForPathChange() {
     let location = window.location.pathname
 
     setInterval(() => {
@@ -337,4 +366,15 @@ window.onload = () => {
     }, 500)
 }
 
-console.log('script end')
+chrome.storage.sync.get(['overlaySettings'], function (result) {
+    console.dir(result.overlaySettings)
+    if (result && Object.keys(result).length === 0) {
+        settings = DEFAULT_SETTINGS
+    } else {
+        settings = DEFAULT_SETTINGS
+        //settings = result.overlaySettings
+    }
+    buildSettingsObjects()
+    waitForVideo()
+    listenForPathChange()
+})

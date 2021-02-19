@@ -22,6 +22,8 @@ const TW_CLASSES = {
     videoPlayerOverlay: 'video-player__overlay',
     playerControls: 'player-controls__right-control-group',
     chatShell: 'chat-shell',
+    chatRoom: 'chat-room',
+    chatScrollableArea: 'chat-scrollable-area__message-container',
     chatInput: 'chat-input',
     chatInputButtonsContainer: 'chat-input__buttons-container',
     liveChat: 'stream-chat',
@@ -70,6 +72,7 @@ const OVERLAY_BTN_SVG = `<svg class="svg-icon" viewBox="0 0 20 20">
 </svg>`
 
 let settings = null
+let settingsElements = null
 
 const DEFAULT_SETTINGS = {
     open: false,
@@ -94,73 +97,198 @@ const DEFAULT_SETTINGS = {
     },
 }
 
-chrome.storage.sync.get(['overlaySettings'], function (result) {
-    console.log('storage GET ' + JSON.stringify(result.overlaySettings))
-    if (result && Object.keys(result).length === 0) {
-        settings = DEFAULT_SETTINGS
-    } else {
-        settings = result.overlaySettings
-    }
-})
+const buildSettingsObjects = () => {
+    settingsElements = {
+        sliders: {
+            fontSize: {
+                name: 'fontSize',
+                type: 'sliders',
+                label: 'Font Size',
+                min: '8',
+                max: '30',
+                value: settings.chat.fontSize,
+                input: function () {
+                    updateSetting('sliders', 'fontSize', this.value)
+                },
+                update: function (value) {
+                    let chat
+                    let fontSize = value
+                    if (isLive) {
+                        let frameDoc = document.querySelector(
+                            `.${TC_CLASSES.overlayFrame}`
+                        ).contentWindow.document
+                        chat = frameDoc.querySelector(
+                            `.${TW_CLASSES.chatScrollableArea}`
+                        )
+                    } else {
+                        chat = document.querySelector(
+                            `.${TC_CLASSES.overlayVodChat}`
+                        )
+                    }
+                    settings.chat.fontSize = value
 
-const settingsElements = {
-    sliders: [
-        {
-            label: 'Font Size',
-            min: 8,
-            max: 30,
-            value: DEFAULT_SETTINGS.chat.fontSize,
-            input: function () {
-                console.log(
-                    `change font size to ${this.value} and update settings`
-                )
+                    chat.setAttribute(
+                        'style',
+                        `font-size: ${fontSize}px !important;`
+                    )
+                },
+            },
+            backgroundOpacity: {
+                name: 'backgroundOpacity',
+                type: 'sliders',
+                label: 'BG Opacity',
+                min: '0',
+                max: '100',
+                value: settings.theme.alpha,
+                input: function () {
+                    updateSetting('sliders', 'backgroundOpacity', this.value)
+                },
+                update: function (value) {
+                    // let chat
+                    // let alpha = value
+                    // if (isLive) {
+                    //     let frameDoc = document.querySelector(
+                    //         `.${TC_CLASSES.overlayFrame}`
+                    //     ).contentWindow.document
+                    //     chat = frameDoc.querySelector(`.${TW_CLASSES.chatRoom}`)
+                    // } else {
+                    //     chat = document.querySelector(
+                    //         `.${TC_CLASSES.overlayVodChat}`
+                    //     )
+                    // }
+                    // const { red, green, blue } = settings.darkMode
+                    //     ? settings.theme.darkBackground
+                    //     : settings.theme.lightBackground
+                    // settings.theme.alpha = alpha
+
+                    // isLive
+                    //     ? chat.setAttribute(
+                    //           'style',
+                    //           `background-color: rgba(${red},${green},${blue},${
+                    //               alpha / 100
+                    //           }) !important;`
+                    //       )
+                    //     : (chat.style.backgroundColor = `rgba(${red},${green},${blue},${
+                    //           alpha / 100
+                    //       }) !important;`)
+                },
+            },
+            chatOpacity: {
+                name: 'chatOpacity',
+                type: 'sliders',
+                label: 'Chat Opacity',
+                min: 0,
+                max: 100,
+                value: settings.chat.opacity,
+                input: function () {
+                    updateSetting('sliders', 'chatOpacity', this.value)
+                },
+                update: function (value) {
+                    let chat
+                    let opacity = value
+                    if (isLive) {
+                        let frameDoc = document.querySelector(
+                            `.${TC_CLASSES.overlayFrame}`
+                        ).contentWindow.document
+                        chat = frameDoc.querySelector(
+                            `.${TW_CLASSES.chatScrollableArea}`
+                        )
+                    } else {
+                        chat = document.querySelector(
+                            `.${TC_CLASSES.overlayVodChat} ul`
+                        )
+                    }
+                    settings.chat.opacity = opacity
+                    chat.style.opacity = opacity / 100
+                },
             },
         },
-        {
-            label: 'BG Opacity',
-            min: 0,
-            max: 100,
-            valus: DEFAULT_SETTINGS.theme.alpha * 100,
-            input: function () {
-                console.log(
-                    `change bg opacity to ${
-                        this.value / 100
-                    } and update settings`
-                )
+        toggles: {
+            boldChat: {
+                name: 'boldChat',
+                type: 'toggles',
+                label: 'Chunky Chat',
+                checked: settings.chat.bold,
+                id: 'over-chat-settings-embolden',
+                onchange: function () {
+                    updateSetting('toggles', 'boldChat', this.checked)
+                },
+                update: function (checked) {
+                    let chat
+
+                    if (isLive) {
+                        let frameDoc = document.querySelector(
+                            `.${TC_CLASSES.overlayFrame}`
+                        ).contentWindow.document
+                        chat = frameDoc.querySelector(
+                            `.${TW_CLASSES.chatScrollableArea}`
+                        )
+                    } else {
+                        chat = document.querySelector(
+                            `.${TC_CLASSES.overlayVodChat} ul`
+                        )
+                    }
+                    settings.chat.bold = checked
+                    chat.style.fontWeight = checked ? 'bold' : 'normal'
+                },
+            },
+            darkMode: {
+                name: 'darkMode',
+                type: 'toggles',
+                label: 'Dark Mode',
+                checked: settings.darkMode,
+                id: 'over-chat-settings-dark-mode',
+                onchange: function () {
+                    console.log(`toggle darkmode ${this.checked}`)
+                },
+                update: function (checked) {
+                    let chat
+                    let doc
+
+                    if (isLive) {
+                        let frameDoc = document.querySelector(
+                            `.${TC_CLASSES.overlayFrame}`
+                        ).contentWindow.document
+                        chat = frameDoc.querySelector(`.${TW_CLASSES.chatRoom}`)
+                        doc = frameDoc
+                    } else {
+                        chat = document.querySelector(
+                            `.${TC_CLASSES.overlayVodChat}`
+                        )
+                    }
+
+                    doc = doc ? doc : document
+
+                    if (checked) {
+                        doc.documentElement.classList.remove(
+                            'tw-root--theme-light'
+                        )
+                        doc.documentElement.classList.add('tw-root--theme-dark')
+                    } else {
+                        doc.documentElement.classList.remove(
+                            'tw-root--theme-dark'
+                        )
+                        doc.documentElement.classList.add(
+                            'tw-root--theme-light'
+                        )
+                    }
+
+                    settings.darkMode = checked
+                    const { red, green, blue } = settings.darkMode
+                        ? settings.theme.darkBackground
+                        : settings.theme.lightBackground
+                    alpha = settings.theme.alpha
+
+                    chat.setAttribute(
+                        'style',
+                        `background-color: rgba(${red},${green},${blue},${
+                            alpha / 100
+                        }) !important;`
+                    )
+                },
             },
         },
-        {
-            label: 'Chat Opacity',
-            min: 0,
-            max: 100,
-            valus: DEFAULT_SETTINGS.chat.opacity * 100,
-            input: function () {
-                console.log(
-                    `change chat opacity to ${
-                        this.value / 100
-                    } and update settings`
-                )
-            },
-        },
-    ],
-    toggles: [
-        {
-            label: 'Chunky Chat',
-            checked: DEFAULT_SETTINGS.chat.bold,
-            id: 'over-chat-settings-embolden',
-            onchange: function () {
-                console.log(`toggle bold chat ${this.checked}`)
-            },
-        },
-        {
-            label: 'Dark Mode',
-            checked: DEFAULT_SETTINGS.darkMode,
-            id: 'over-chat-settings-dark-mode',
-            onchange: function () {
-                console.log(`toggle darkmode ${this.checked}`)
-            },
-        },
-    ],
+    }
 }
 
 // Wait until element exists then resolve on element https://gist.github.com/jwilson8767/db379026efcbd932f64382db4b02853e
@@ -278,18 +406,17 @@ const setDraggable = (draggable, container, frame) => {
     }
 }
 
-
 const animateShowComponent = (ElSelector, offsetElSelector) => {
     var elem = document.querySelector(ElSelector)
     let offset = document.querySelector(offsetElSelector).offsetHeight
     let isOpen
-    
-    if (elem.classList.contains('tc-open')){
+
+    if (elem.classList.contains('tc-open')) {
         isOpen = true
         elem.classList.remove('tc-open')
         elem.classList.add('tc-closed')
     } else {
-        isOpen = false    
+        isOpen = false
         elem.classList.remove('tc-closed')
         elem.classList.add('tc-open')
     }
@@ -306,21 +433,6 @@ const animateShowComponent = (ElSelector, offsetElSelector) => {
             elem.style.top = isOpen ? `${start + pos}px` : `${start - pos}px`
         }
     }
-}
-
-
-// https://stackoverflow.com/a/59093093/14549357
-const getNodeHeight = (node) => {
-    var height, clone = node.cloneNode(true)
-    // hide the meassured (cloned) element
-    clone.style.cssText = "position:fixed; top:-9999px; opacity:0;"
-    // add the clone to the DOM 
-    document.body.appendChild(clone)
-    // meassure it
-    height = clone.clientHeight
-    // cleaup 
-    clone.parentNode.removeChild(clone)
-    return height
 }
 
 // globalThis.overlay = {

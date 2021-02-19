@@ -43,7 +43,9 @@
 
 .tc-settings-container {
     position: absolute;
-    padding: 1rem;
+    padding-left: 1rem;
+    padding-bottom: 1rem;
+    top: calc(-35px - 1rem);
 }
 
 .tc-buttons-container {
