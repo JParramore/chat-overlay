@@ -3,7 +3,7 @@
     width: 50%;
     position: absolute;
     z-index: 2147483647;
-    border: 2px solid pink;
+    border: 2px solid transparent;
     border-radius: 5px;
     resize: both;
     flex-direction: column;
@@ -46,10 +46,29 @@
     padding-left: 1rem;
     padding-bottom: 1rem;
     top: calc(-35px - 1rem);
+    visibility: hidden;
 }
 
-.tc-buttons-container {
+.tc-setting {
+    display: flex;
+    justify-content: space-between;
+}
 
+input[type="range"] {
+    height: 1.6rem;
+    background: rgb(31, 31, 35);
+    border-radius: 8px;
+    border: 2px solid rgb(145,71,255);
+    -webkit-appearance: none !important;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none !important;
+    background: rgb(255,255,255);
+    height: 0.8rem;
+    width: 0.8rem;
+    cursor: pointer;
+    border-radius: 100%;
 }
 
 .tc-button-wrapper {
@@ -57,7 +76,9 @@
 }
 
 .tc-settings-wrapper {
-    background-color: navy;
+    background-color: rgb(31,31,35);
+    border-radius: 5px;
+    padding: 1rem;
 }
 
 .svg-icon {

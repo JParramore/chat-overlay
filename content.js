@@ -58,9 +58,12 @@ function buildOverlay() {
                     )
                 )
             })
-            elementReady(`.${settingsContainer}`, document).then((el) =>
-                updateAllSettings()
-            )
+            elementReady(`.${settingsContainer}`, document).then((el) => {
+                updateThemeStyles()
+                updateChatStyles()
+                frameDoc.body.querySelector('.chat-input').classList.add('chat-input__hide')
+                addOverlayFunctions(container, el, frameDoc.body)
+            })
         }
         container.prepend(frame)
     } else {
@@ -89,10 +92,13 @@ function buildOverlay() {
     container.appendChild(relativeWrapper)
 
     if (!isLive)
-        elementReady(`.${overlayVodChat}`, document).then((el) =>
-            updateAllSettings()
-        )
+        elementReady(`.${overlayVodChat}`, document).then((el) => {
+            updateThemeStyles()
+            updateChatStyles()
+            addOverlayFunctions(container, settingsContainerEl, null)
+        })
 
+    
     return container
 }
 
@@ -126,15 +132,17 @@ function buildOverlaySettings() {
 }
 
 function buildToggleSetting(text, checked, id, onchange) {
+    const { settingContainer } = TC_CLASSES
+
     let container = document.createElement('div')
-    container.style.display = 'flex'
-    container.style.justifyContent = 'space-between'
+    container.className = settingContainer
 
     let twToggle = document.createElement('div')
     twToggle.className = 'tw-toggle'
 
-    let textEl = document.createElement('div')
+    let textEl = document.createElement('span')
     textEl.innerHTML = text
+    textEl.style.paddingRight = '1rem'
 
     let input = document.createElement('input')
     input.type = 'checkbox'
@@ -158,10 +166,14 @@ function buildToggleSetting(text, checked, id, onchange) {
 }
 
 function buildSliderSetting(text, min, max, value, input) {
-    let container = document.createElement('div')
+    const { settingContainer } = TC_CLASSES
 
-    let label = document.createElement('div')
+    let container = document.createElement('div')
+    container.className = settingContainer
+
+    let label = document.createElement('span')
     label.innerHTML = text
+    label.style.paddingRight = '1rem'
 
     slider = document.createElement('input')
     slider.type = 'range'
@@ -308,21 +320,96 @@ function buildToggleOverlayButton() {
     return container
 }
 
-const updateSetting = (type, setting, value) => {
-    settingsElements[type][setting].update(value)
+function addOverlayFunctions(overlay, buttons, frame) {
+    const { chatInput } = TW_CLASSES
+    
+    let input = frame ? frame.querySelector(`.${chatInput}`) : null
+    console.log(frame)
+    console.log(input)
 
-    chrome.storage.sync.set({ 'overlaySettings': settings }, function () {})
+    overlay.onmouseover = () => {
+        overlay.style.border = '2px solid rgb(145,71,255)'
+        overlay.style.resize = 'auto'
+        buttons.style.visibility = 'visible'
+        if (input) input.classList.remove('chat-input__hide')
+    }
+    overlay.onmouseout = () => {
+        overlay.style.border = '2px solid transparent'
+        overlay.style.resize = 'none'
+        buttons.style.visibility = 'hidden'
+        if (input) input.classList.add('chat-input__hide')
+    }
 }
 
-function updateAllSettings() {
-    Object.keys(settingsElements).forEach((settingType) =>
-        Object.keys(settingsElements[settingType]).forEach((settingName) => {
-            const { type, name, value, checked } = settingsElements[
-                settingType
-            ][settingName]
-            updateSetting(type, name, value || checked)
-        })
+function updateThemeStyles() {
+    
+    let chat, focusdoc
+
+    if (isLive) {
+        focusdoc = document.querySelector(`.${TC_CLASSES.overlayFrame}`)
+            .contentWindow.document
+        chat = focusdoc.querySelector(`.${TW_CLASSES.chatRoom}`)
+    } else {
+        focusdoc = document
+        chat = document.querySelector(`.${TC_CLASSES.overlayVodChat}`)
+    }
+
+    const theme = settings.theme
+    const darkMode = theme.darkMode
+
+    const { red, green, blue } = darkMode
+        ? theme.darkBackground
+        : theme.lightBackground
+
+    const alpha = theme.alpha
+
+    chat.setAttribute(
+        'style',
+        `background-color: rgba(${red},${green},${blue},${
+            alpha / 100
+        }) !important;`
     )
+
+    if (isLive) {
+        if (darkMode) {
+            focusdoc.documentElement.classList.remove('tw-root--theme-light')
+            focusdoc.documentElement.classList.add('tw-root--theme-dark')
+        } else {
+            focusdoc.documentElement.classList.remove('tw-root--theme-dark')
+            focusdoc.documentElement.classList.add('tw-root--theme-light')
+        }
+    } else {
+        chat.style.color = darkMode ? 'white' : 'black'
+    }
+
+    chrome.storage.sync.set({ overlaySettings: settings }, function () {
+        console.log('settings saved', settings)
+    })
+}
+
+function updateChatStyles() {
+    chrome.storage.sync.set({ overlaySettings: settings }, function () {
+        console.log('settings saved', settings)
+    })
+
+    let chat
+
+    if (isLive) {
+        let frameDoc = document.querySelector(`.${TC_CLASSES.overlayFrame}`)
+            .contentWindow.document
+        chat = frameDoc.querySelector(`.${TW_CLASSES.chatScrollableArea}`)
+    } else {
+        chat = document.querySelector(`.${TC_CLASSES.overlayVodChat} ul`)
+    }
+
+    const { opacity, bold, fontSize } = settings.chat
+    chat.setAttribute('style', `font-size: ${fontSize}px !important;`)
+    chat.style.fontWeight = bold ? 'bold' : 'normal'
+    chat.style.opacity = opacity / 100
+
+    chrome.storage.sync.set({ overlaySettings: settings }, function () {
+        console.log('settings saved', settings)
+    })
 }
 
 function waitForVideo() {
@@ -366,13 +453,14 @@ function listenForPathChange() {
     }, 500)
 }
 
+// chrome.storage.sync.remove('overlaySettings') // clear settings
+
 chrome.storage.sync.get(['overlaySettings'], function (result) {
-    console.dir(result.overlaySettings)
+    console.dir('got', result)
     if (result && Object.keys(result).length === 0) {
         settings = DEFAULT_SETTINGS
     } else {
-        settings = DEFAULT_SETTINGS
-        //settings = result.overlaySettings
+        settings = result.overlaySettings
     }
     buildSettingsObjects()
     waitForVideo()

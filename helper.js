@@ -7,6 +7,7 @@ const TC_CLASSES = {
     overlayButtonsContainer: 'tc-buttons-container',
     overlayButton: 'tc-overlay-button',
     buttonWrapper: 'tc-button-wrapper',
+    settingContainer: 'tc-setting',
     settingsButton: 'tc-settings-button',
     settingsIcon: ['fas', 'fa-cog'],
     settingsContainer: 'tc-settings-container',
@@ -63,6 +64,7 @@ const TW_CLASSES = {
         'stream-chat-header',
         'community-highlight-stack__scroll-area--disable',
         'community-highlight-stack__backlog-card',
+        'chat-input'
     ],
 }
 
@@ -75,9 +77,8 @@ let settings = null
 let settingsElements = null
 
 const DEFAULT_SETTINGS = {
-    open: false,
-    darkMode: true,
     theme: {
+        darkMode: true,
         darkBackground: {
             red: 31,
             green: 31,
@@ -88,12 +89,12 @@ const DEFAULT_SETTINGS = {
             green: 255,
             blue: 255,
         },
-        alpha: 0.25,
+        alpha: 25,
     },
     chat: {
         fontSize: 14,
         bold: false,
-        opacity: 1.0,
+        opacity: 100,
     },
 }
 
@@ -104,102 +105,36 @@ const buildSettingsObjects = () => {
                 name: 'fontSize',
                 type: 'sliders',
                 label: 'Font Size',
-                min: '8',
-                max: '30',
+                min: 8,
+                max: 30,
                 value: settings.chat.fontSize,
                 input: function () {
-                    updateSetting('sliders', 'fontSize', this.value)
-                },
-                update: function (value) {
-                    let chat
-                    let fontSize = value
-                    if (isLive) {
-                        let frameDoc = document.querySelector(
-                            `.${TC_CLASSES.overlayFrame}`
-                        ).contentWindow.document
-                        chat = frameDoc.querySelector(
-                            `.${TW_CLASSES.chatScrollableArea}`
-                        )
-                    } else {
-                        chat = document.querySelector(
-                            `.${TC_CLASSES.overlayVodChat}`
-                        )
-                    }
-                    settings.chat.fontSize = value
-
-                    chat.setAttribute(
-                        'style',
-                        `font-size: ${fontSize}px !important;`
-                    )
+                    settings.chat.fontSize = this.value
+                    updateChatStyles()
                 },
             },
             backgroundOpacity: {
                 name: 'backgroundOpacity',
                 type: 'sliders',
                 label: 'BG Opacity',
-                min: '0',
-                max: '100',
+                min: 1,
+                max: 100,
                 value: settings.theme.alpha,
                 input: function () {
-                    updateSetting('sliders', 'backgroundOpacity', this.value)
-                },
-                update: function (value) {
-                    // let chat
-                    // let alpha = value
-                    // if (isLive) {
-                    //     let frameDoc = document.querySelector(
-                    //         `.${TC_CLASSES.overlayFrame}`
-                    //     ).contentWindow.document
-                    //     chat = frameDoc.querySelector(`.${TW_CLASSES.chatRoom}`)
-                    // } else {
-                    //     chat = document.querySelector(
-                    //         `.${TC_CLASSES.overlayVodChat}`
-                    //     )
-                    // }
-                    // const { red, green, blue } = settings.darkMode
-                    //     ? settings.theme.darkBackground
-                    //     : settings.theme.lightBackground
-                    // settings.theme.alpha = alpha
-
-                    // isLive
-                    //     ? chat.setAttribute(
-                    //           'style',
-                    //           `background-color: rgba(${red},${green},${blue},${
-                    //               alpha / 100
-                    //           }) !important;`
-                    //       )
-                    //     : (chat.style.backgroundColor = `rgba(${red},${green},${blue},${
-                    //           alpha / 100
-                    //       }) !important;`)
+                    settings.theme.alpha = this.value
+                    updateThemeStyles()
                 },
             },
             chatOpacity: {
                 name: 'chatOpacity',
                 type: 'sliders',
                 label: 'Chat Opacity',
-                min: 0,
+                min: 1,
                 max: 100,
                 value: settings.chat.opacity,
                 input: function () {
-                    updateSetting('sliders', 'chatOpacity', this.value)
-                },
-                update: function (value) {
-                    let chat
-                    let opacity = value
-                    if (isLive) {
-                        let frameDoc = document.querySelector(
-                            `.${TC_CLASSES.overlayFrame}`
-                        ).contentWindow.document
-                        chat = frameDoc.querySelector(
-                            `.${TW_CLASSES.chatScrollableArea}`
-                        )
-                    } else {
-                        chat = document.querySelector(
-                            `.${TC_CLASSES.overlayVodChat} ul`
-                        )
-                    }
-                    settings.chat.opacity = opacity
-                    chat.style.opacity = opacity / 100
+                    settings.chat.opacity = this.value
+                    updateChatStyles()
                 },
             },
         },
@@ -211,80 +146,19 @@ const buildSettingsObjects = () => {
                 checked: settings.chat.bold,
                 id: 'over-chat-settings-embolden',
                 onchange: function () {
-                    updateSetting('toggles', 'boldChat', this.checked)
-                },
-                update: function (checked) {
-                    let chat
-
-                    if (isLive) {
-                        let frameDoc = document.querySelector(
-                            `.${TC_CLASSES.overlayFrame}`
-                        ).contentWindow.document
-                        chat = frameDoc.querySelector(
-                            `.${TW_CLASSES.chatScrollableArea}`
-                        )
-                    } else {
-                        chat = document.querySelector(
-                            `.${TC_CLASSES.overlayVodChat} ul`
-                        )
-                    }
-                    settings.chat.bold = checked
-                    chat.style.fontWeight = checked ? 'bold' : 'normal'
+                    settings.chat.bold = this.checked
+                    updateChatStyles()
                 },
             },
             darkMode: {
                 name: 'darkMode',
                 type: 'toggles',
                 label: 'Dark Mode',
-                checked: settings.darkMode,
+                checked: settings.theme.darkMode,
                 id: 'over-chat-settings-dark-mode',
                 onchange: function () {
-                    console.log(`toggle darkmode ${this.checked}`)
-                },
-                update: function (checked) {
-                    let chat
-                    let doc
-
-                    if (isLive) {
-                        let frameDoc = document.querySelector(
-                            `.${TC_CLASSES.overlayFrame}`
-                        ).contentWindow.document
-                        chat = frameDoc.querySelector(`.${TW_CLASSES.chatRoom}`)
-                        doc = frameDoc
-                    } else {
-                        chat = document.querySelector(
-                            `.${TC_CLASSES.overlayVodChat}`
-                        )
-                    }
-
-                    doc = doc ? doc : document
-
-                    if (checked) {
-                        doc.documentElement.classList.remove(
-                            'tw-root--theme-light'
-                        )
-                        doc.documentElement.classList.add('tw-root--theme-dark')
-                    } else {
-                        doc.documentElement.classList.remove(
-                            'tw-root--theme-dark'
-                        )
-                        doc.documentElement.classList.add(
-                            'tw-root--theme-light'
-                        )
-                    }
-
-                    settings.darkMode = checked
-                    const { red, green, blue } = settings.darkMode
-                        ? settings.theme.darkBackground
-                        : settings.theme.lightBackground
-                    alpha = settings.theme.alpha
-
-                    chat.setAttribute(
-                        'style',
-                        `background-color: rgba(${red},${green},${blue},${
-                            alpha / 100
-                        }) !important;`
-                    )
+                    settings.theme.darkMode = this.checked
+                    updateThemeStyles()
                 },
             },
         },
@@ -313,6 +187,7 @@ const elementReady = (selector, doc) => {
 }
 
 const observeVodMessage = (twMessageWrapper) => {
+    let countLines = 0
     observer = new MutationObserver(function (mutationsList, observer) {
         for (const mutation of mutationsList) {
             mutation.addedNodes.forEach((node) => {
@@ -321,7 +196,11 @@ const observeVodMessage = (twMessageWrapper) => {
                         `.${TC_CLASSES.overlayVodChat} ul`
                     )
                     let clone = node.cloneNode(true)
+                    if (countLines > 100) listContainer.childNodes[0].remove()
+
                     listContainer.appendChild(clone)
+                    countLines += 1
+
                     let tcChat = document.querySelector('.tc-overlay-vod-chat')
                     tcChat.scrollTop = tcChat.scrollHeight
                 }
