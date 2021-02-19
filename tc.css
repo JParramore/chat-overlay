@@ -1,6 +1,8 @@
 .tc-overlay {
     height: 50%;
     width: 50%;
+    min-width: 270px;
+    min-height: 170px;
     position: absolute;
     z-index: 2147483647;
     border: 2px solid transparent;
@@ -63,7 +65,7 @@
     position: absolute;
     padding-left: 1rem;
     padding-bottom: 1rem;
-    top: -45px;
+    top: -40px;
     visibility: hidden;
 }
 

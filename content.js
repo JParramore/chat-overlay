@@ -1,7 +1,7 @@
 let isLive = true
 
 function init() {
-    const { core } = TC_CLASSES
+    const { core, overlayButton } = TC_CLASSES
     const { playerControls, videoPlayerOverlay } = TW_CLASSES
     let coreComponents = []
 
@@ -15,10 +15,11 @@ function init() {
     let videoControls = document.querySelector(`.${playerControls}`)
     let overlayButtonEl = buildToggleOverlayButton()
     videoControls.prepend(overlayButtonEl)
-    observeElementRemoved('tc-overlay-button')
 
     coreComponents.push(overlayButtonEl)
     coreComponents.push(overlayEl)
+
+    elementReady(`.${overlayButton}`, document).then(el => observeElementRemoved(el))
 
     coreComponents.forEach((element) => element.classList.add(core))
 }
@@ -34,7 +35,7 @@ function buildOverlay() {
 
     let container = document.createElement('div')
     container.className = overlay
-    // container.style.display = 'none' // TODO: ON FOR PROD
+    container.style.display = 'none'
 
     if (isLive) {
         const channel = window.location.pathname.substr(1)
@@ -339,8 +340,6 @@ function addOverlayFunctions(overlay, buttons, frame) {
     const { chatInput } = TW_CLASSES
 
     let input = frame ? frame.querySelector(`.${chatInput}`) : null
-    console.log(frame)
-    console.log(input)
 
     overlay.onmouseover = () => {
         overlay.style.border = '2px solid rgb(145,71,255)'
@@ -351,8 +350,8 @@ function addOverlayFunctions(overlay, buttons, frame) {
     overlay.onmouseout = () => {
         overlay.style.border = '2px solid transparent'
         overlay.style.resize = 'none'
-        //buttons.style.visibility = 'hidden'
-        //if (input) input.classList.add('chat-input__hide')
+        buttons.style.visibility = 'hidden'
+        if (input) input.classList.add('chat-input__hide')
     }
 }
 
@@ -396,9 +395,7 @@ function updateThemeStyles() {
         chat.style.color = darkMode ? 'white' : 'black'
     }
 
-    chrome.storage.sync.set({ overlaySettings: settings }, function () {
-        console.log('settings saved', settings)
-    })
+    chrome.storage.sync.set({ overlaySettings: settings })
 }
 
 function updateChatStyles() {
@@ -417,9 +414,7 @@ function updateChatStyles() {
     chat.style.fontWeight = bold ? 'bold' : 'normal'
     chat.style.opacity = opacity / 100
 
-    chrome.storage.sync.set({ overlaySettings: settings }, function () {
-        console.log('settings saved', settings)
-    })
+    chrome.storage.sync.set({ overlaySettings: settings })
 }
 
 function waitForVideo() {
@@ -458,12 +453,11 @@ function listenForPathChange() {
         if (location !== window.location.pathname) {
             console.log('location changed')
             location = window.location.pathname
-            waitForVideo()
+            //waitForVideo()
         }
     }, 500)
 }
 
-// chrome.storage.sync.remove('overlaySettings') // clear settings
 
 chrome.storage.sync.get(['overlaySettings'], function (result) {
     console.dir('got', result)
@@ -474,5 +468,5 @@ chrome.storage.sync.get(['overlaySettings'], function (result) {
     }
     buildSettingsObjects()
     waitForVideo()
-    listenForPathChange()
+    //listenForPathChange()
 })

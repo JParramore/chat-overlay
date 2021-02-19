@@ -187,13 +187,15 @@ const elementReady = (selector, doc) => {
     })
 }
 
+let vodObserver = null
 const observeVodMessage = (twMessageWrapper) => {
     let pathname = window.location.pathname
     let countLines = 0
-    observer = new MutationObserver(function (mutationsList, observer) {
+    if (vodObserver) vodObserver.disconnect()
+    vodObserver = new MutationObserver(function (mutationsList, vodObserver) {
         for (const mutation of mutationsList) {
             mutation.addedNodes.forEach((node) => {
-                if (window.location.pathname !== pathname) observer.disconnect()
+                if (window.location.pathname !== pathname) vodObserver.disconnect()
                 if (node.matches(`li[class="tw-full-width`)) {
                     let listContainer = document.querySelector(
                         `.${TC_CLASSES.overlayVodChat} ul`
@@ -215,11 +217,11 @@ const observeVodMessage = (twMessageWrapper) => {
         }
     })
     const config = { childList: true, subtree: true }
-    observer.observe(twMessageWrapper, config)
+    vodObserver.observe(twMessageWrapper, config)
 }
 
-const observeElementRemoved = (targetSel) => {
-    let target = document.querySelector(`.${targetSel}`)
+
+const observeElementRemoved = (target) => {
 
     observer = new MutationObserver(function (mutationsList, observer) {
         if (!document.body.contains(target)) {
@@ -314,7 +316,6 @@ const animateShowComponent = (ElSelector, offsetElSelector) => {
     var elem = document.querySelector(ElSelector)
     let offset = document.querySelector(offsetElSelector).offsetHeight
     let isOpen
-    console.log(offset)
 
     if (elem.classList.contains('tc-open')) {
         isOpen = true
