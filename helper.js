@@ -7,6 +7,7 @@ const TC_CLASSES = {
     overlayButtonsContainer: 'tc-buttons-container',
     overlayButton: 'tc-overlay-button',
     buttonWrapper: 'tc-button-wrapper',
+    vodMessage: 'tc-vod-message',
     settingContainer: 'tc-setting',
     settingsButton: 'tc-settings-button',
     settingsIcon: ['fas', 'fa-cog'],
@@ -64,7 +65,7 @@ const TW_CLASSES = {
         'stream-chat-header',
         'community-highlight-stack__scroll-area--disable',
         'community-highlight-stack__backlog-card',
-        'chat-input'
+        'chat-input',
     ],
 }
 
@@ -186,23 +187,28 @@ const elementReady = (selector, doc) => {
     })
 }
 
+
 const observeVodMessage = (twMessageWrapper) => {
+    let pathname = window.location.pathname
     let countLines = 0
     observer = new MutationObserver(function (mutationsList, observer) {
         for (const mutation of mutationsList) {
             mutation.addedNodes.forEach((node) => {
+                if (window.location.pathname !== pathname ) observer.disconnect()
                 if (node.matches(`li[class="tw-full-width`)) {
+
                     let listContainer = document.querySelector(
                         `.${TC_CLASSES.overlayVodChat} ul`
                     )
                     let clone = node.cloneNode(true)
+                    clone.classList.add(TC_CLASSES.vodMessage)
                     if (countLines > 100) listContainer.childNodes[0].remove()
 
                     listContainer.appendChild(clone)
                     countLines += 1
 
-                    let tcChat = document.querySelector('.tc-overlay-vod-chat')
-                    tcChat.scrollTop = tcChat.scrollHeight
+                    let tcChat = document.querySelector(`.${TW_CLASSES.overlayVodChat}`)
+                    if (tcChat && tcChat.scrollHeight) tcChat.scrollTop = tcChat.scrollHeight
                 }
             })
         }

@@ -7,6 +7,7 @@ function init() {
 
     // Garbage collect extension components
     document.querySelectorAll(`.${core}`).forEach((element) => element.remove())
+    document.querySelectorAll(`${core}`).forEach((el)=> console.log(el))
 
     let video = document.querySelector(`.${videoPlayerOverlay}`)
     let overlayEl = buildOverlay()
@@ -29,13 +30,7 @@ function buildOverlay() {
         overlayVodChat,
         settingsContainer,
     } = TC_CLASSES
-    const {
-        toHide,
-        display,
-        vodChat,
-        chatInputButtonsContainer,
-        vodChatListWrapper,
-    } = TW_CLASSES
+    const { toHide, display, vodChatListWrapper } = TW_CLASSES
 
     let container = document.createElement('div')
     container.className = overlay
@@ -61,7 +56,9 @@ function buildOverlay() {
             elementReady(`.${settingsContainer}`, document).then((el) => {
                 updateThemeStyles()
                 updateChatStyles()
-                frameDoc.body.querySelector('.chat-input').classList.add('chat-input__hide')
+                frameDoc.body
+                    .querySelector('.chat-input')
+                    .classList.add('chat-input__hide')
                 addOverlayFunctions(container, el, frameDoc.body)
             })
         }
@@ -98,7 +95,6 @@ function buildOverlay() {
             addOverlayFunctions(container, settingsContainerEl, null)
         })
 
-    
     return container
 }
 
@@ -296,13 +292,13 @@ function buildToggleOverlayButton() {
     let button = document.createElement('button')
     button.classList.add(...twButtonClasses)
     button.ariaLabel = 'Chat Overlay'
-    button.onclick = () => {
+    button.onclick = (e) => {
         let overlayEl = document.querySelector(`.${overlay}`)
         const hidden =
             !overlayEl.style.display || overlayEl.style.display === 'none'
         if (hidden) {
             overlayEl.style.display = 'flex'
-            // TODO flashFadeIn
+            flashFade(overlayEl)
         } else {
             overlayEl.style.display = 'none'
         }
@@ -320,9 +316,27 @@ function buildToggleOverlayButton() {
     return container
 }
 
+function flashFade(el) {
+    let box = document.createElement('div')
+    box.className = 'tc-flash-fade'
+    el.appendChild(box)
+
+    var fadeEffect = setInterval(function () {
+        if (!box.style.opacity) {
+            box.style.opacity = 1
+        }
+        if (box.style.opacity > 0) {
+            box.style.opacity -= 0.1
+        } else {
+            clearInterval(fadeEffect)
+            box.remove()
+        }
+    }, 60)
+}
+
 function addOverlayFunctions(overlay, buttons, frame) {
     const { chatInput } = TW_CLASSES
-    
+
     let input = frame ? frame.querySelector(`.${chatInput}`) : null
     console.log(frame)
     console.log(input)
@@ -342,7 +356,6 @@ function addOverlayFunctions(overlay, buttons, frame) {
 }
 
 function updateThemeStyles() {
-    
     let chat, focusdoc
 
     if (isLive) {

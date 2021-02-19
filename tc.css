@@ -10,6 +10,24 @@
     overflow: hidden;
 }
 
+.tc-overlay-vod-chat {
+    margin-right: 0px !important;
+}
+
+.tc-vod-message {
+    text-decoration: none !important;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.tc-flash-fade {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(145,71,255,0.5);
+}
+
 .tc-drag-button,
 .tc-settings-button {
     display: inline-flex;
@@ -54,7 +72,7 @@
     justify-content: space-between;
 }
 
-input[type="range"] {
+.tc-overlay input[type="range"] {
     height: 1.6rem;
     background: rgb(31, 31, 35);
     border-radius: 8px;
@@ -62,7 +80,7 @@ input[type="range"] {
     -webkit-appearance: none !important;
 }
 
-input[type="range"]::-webkit-slider-thumb {
+.tc-overlay input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none !important;
     background: rgb(255,255,255);
     height: 0.8rem;
