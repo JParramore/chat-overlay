@@ -12,6 +12,7 @@ Movable, resizable, transparent chat box overlay:
 
 ## Features
 - Toggle overlay on and off while at all times
+- Play twitch clips posted in chat over the video player
 - Change overlay background opacity
 - Change overlay text opacity
 - Change overlay chat message font size
@@ -33,3 +34,5 @@ Movable, resizable, transparent chat box overlay:
 
 ### How to use
  Open a [twitch.tv](https://www.twitch.tv/) stream and click the overlay icon bottom right of the video player. Hover the overlay to change settings, move, and resize.
+
+ When twitch clips are posted in chat click the play button to the right of the message to play the clip over the video player.
