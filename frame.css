@@ -1,0 +1,25 @@
+.channel-leaderboard,
+.community-points-summary,
+.stream-chat-header,
+.community-highlight-stack__backlog-card,
+.community-highlight-stack__scroll-area--disable {
+    display: none !important;
+}
+
+.chat-input__hide {
+    display: none !important;
+}
+
+html,
+body {
+    background-color: transparent !important;
+}
+
+.chat-room {
+    background-color: rgba(0, 0, 0, 0) !important;
+}
+
+.chat-scrollable-area__message-container .chat-line__message, .chat-line__moderation, .chat-line__status, .user-notice-line {
+    padding-left: 1rem !important; 
+    padding-right: 1rem !important;
+}
