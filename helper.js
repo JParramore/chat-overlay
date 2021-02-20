@@ -328,7 +328,6 @@ const setOverlayPosition = (overlay, parent) => {
     overlayPosition.left = overlay.offsetLeft / parent.offsetWidth
     overlayPosition.width = overlay.offsetWidth / parent.offsetWidth
     overlayPosition.height = overlay.offsetHeight / parent.offsetHeight
-    console.log('set overlay pos: ', overlayPosition)
 }
 
 const animateShowComponent = (ElSelector, offsetElSelector) => {
