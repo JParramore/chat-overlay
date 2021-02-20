@@ -423,6 +423,20 @@ function updateChatStyles() {
     chrome.storage.local.set({ overlaySettings: settings })
 }
 
+function translateOverlayPosition() {
+    const { top, left, width, height } = overlayPosition
+    let overlayEl = document.querySelector(`.${TC_CLASSES.overlay}`)
+    let buttonEl = document.querySelector(`.${TC_CLASSES.overlayButton}`)
+
+    if (overlayEl && buttonEl) {
+        overlayEl.style.top = `${top * 100}%`
+        overlayEl.style.left = `${left * 100}%`
+        overlayEl.style.height = `${height * 100}%`
+        overlayEl.style.width = `${width * 100}%`
+    }
+
+}
+
 function waitForVideo() {
     const { playerControls, chatShell, liveChat, vodChat } = TW_CLASSES
     const timeNow = Date.now()
@@ -490,4 +504,6 @@ chrome.storage.local.get(['overlaySettings'], function (result) {
             toggleShowOverlay()
         }
     }
+
+    document.onfullscreenchange = translateOverlayPosition
 })

@@ -307,11 +307,28 @@ const setDraggable = (draggable, container, frame) => {
         document.onmouseup = null
         document.onmousemove = null
 
+        setOverlayPosition(container, container.parentElement)
+
         if (frame) {
             //frame.onmousemove = null
             frame.onmouseup = null
         }
     }
+}
+
+let overlayPosition = {
+    top: 0.0,
+    left: 0.0,
+    width: 0.5,
+    height: 0.5
+}
+
+const setOverlayPosition = (overlay, parent) => {
+    overlayPosition.top = overlay.offsetTop / parent.offsetHeight
+    overlayPosition.left = overlay.offsetLeft / parent.offsetWidth
+    overlayPosition.width = overlay.offsetWidth / parent.offsetWidth
+    overlayPosition.height = overlay.offsetHeight / parent.offsetHeight
+    console.log('set overlay pos: ', overlayPosition)
 }
 
 const animateShowComponent = (ElSelector, offsetElSelector) => {
