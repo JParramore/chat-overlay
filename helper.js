@@ -28,6 +28,7 @@ const TW_CLASSES = {
     chatScrollableArea: 'chat-scrollable-area__message-container',
     chatInput: 'chat-input',
     chatInputButtonsContainer: 'chat-input__buttons-container',
+    scrollBar: 'simplebar-scrollbar',
     liveChat: 'stream-chat',
     vodChat: 'qa-vod-chat',
     vodChatListWrapper: 'video-chat__message-list-wrapper',
@@ -187,6 +188,24 @@ const elementReady = (selector, doc) => {
     })
 }
 
+const elementRemoved = (selector, doc) => {
+    return new Promise((resolve, reject) => {
+        let el = doc.querySelector(selector)
+        if (!el) {
+            resolve()
+        }
+        new MutationObserver((mutationRecords, observer) => {
+            if (!doc.querySelector(selector)) {
+                resolve()
+                observer.disconnect()
+            }
+        }).observe(doc, {
+            childList: true,
+            subtree: true,
+        })
+    })
+}
+
 let vodObserver = null
 const observeVodMessage = (twMessageWrapper) => {
     let pathname = window.location.pathname
@@ -220,23 +239,6 @@ const observeVodMessage = (twMessageWrapper) => {
     vodObserver.observe(twMessageWrapper, config)
 }
 
-
-const observeElementRemoved = (target) => {
-
-    observer = new MutationObserver(function (mutationsList, observer) {
-        if (!document.body.contains(target)) {
-            console.log('target gone missing')
-            observer.disconnect()
-            elementReady(`.${TW_CLASSES.playerControls}`, document).then(
-                (el) => {
-                    waitForVideo()
-                }
-            )
-        }
-    })
-    const config = { childList: true, subtree: true }
-    observer.observe(document, config)
-}
 
 const setDraggable = (draggable, container, frame) => {
     let fsElement = document.querySelector('.video-player__overlay')
@@ -289,14 +291,12 @@ const setDraggable = (draggable, container, frame) => {
             container.style.left = '0px'
         }
         if (container.offsetTop + container.offsetHeight > videoPlayerHeight) {
-            container.style.top = `${
-                videoPlayerHeight - container.offsetHeight
-            }px`
+            container.style.top = `${videoPlayerHeight - container.offsetHeight
+                }px`
         }
         if (container.offsetLeft + container.offsetWidth > videoPlayerWidth) {
-            container.style.left = `${
-                videoPlayerWidth - container.offsetWidth
-            }px`
+            container.style.left = `${videoPlayerWidth - container.offsetWidth
+                }px`
         }
     }
 

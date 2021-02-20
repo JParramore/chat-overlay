@@ -18,9 +18,6 @@ function init() {
 
     coreComponents.push(overlayButtonEl)
     coreComponents.push(overlayEl)
-
-    elementReady(`.${overlayButton}`, document).then(el => observeElementRemoved(el))
-
     coreComponents.forEach((element) => element.classList.add(core))
 }
 
@@ -39,7 +36,7 @@ function buildOverlay() {
 
     if (isLive) {
         const channel = window.location.pathname.substr(1)
-        
+
         let frame = document.createElement('iframe')
         frame.className = overlayFrame
         frame.src = `https://www.twitch.tv/popout/${channel}/chat`
@@ -268,7 +265,8 @@ function buildOverlaySettingsButton() {
     button.className = settingsButton
     coreButton.forEach((className) => button.classList.add(className))
     button.onclick = () => {
-        document.querySelector(`.${settingsWrapper}`).parentElement.className = 'tc-wrapper-1rem'
+        document.querySelector(`.${settingsWrapper}`).parentElement.className =
+            'tc-wrapper-1rem'
         animateShowComponent(`.${settingsContainer}`, `.tc-wrapper-1rem`)
     }
 
@@ -419,10 +417,9 @@ function updateChatStyles() {
 
 function waitForVideo() {
     const { playerControls, chatShell, liveChat, vodChat } = TW_CLASSES
-
     const timeNow = Date.now()
     const int = setInterval(() => {
-        if (Date.now() - timeNow > 10000) {
+        if (Date.now() - timeNow > 100000000) {
             console.log('waitForVideo timed out')
             clearInterval(int)
         }
@@ -437,6 +434,7 @@ function waitForVideo() {
                 init(false)
                 clearInterval(int)
             } else if (isLiveChat) {
+                isLive = true
                 init()
                 clearInterval(int)
             } else {
@@ -449,15 +447,22 @@ function waitForVideo() {
 function listenForPathChange() {
     let location = window.location.pathname
 
-    setInterval(() => {
-        if (location !== window.location.pathname) {
-            console.log('location changed')
-            location = window.location.pathname
-            //waitForVideo()
+    const int = setInterval(() => {
+        let overlayButton = document.querySelector(
+            `.${TC_CLASSES.overlayButton}`
+        )
+
+        if (!overlayButton) {
+            let overlayEl = document.querySelector(`.${TC_CLASSES.overlay}`)
+            if (overlayEl) overlayEl.style.display = 'none'
+            waitForVideo()
+            clearInterval(int)
+            elementReady(`.${TC_CLASSES.overlayButton}`, document).then(
+                listenForPathChange()
+            )
         }
     }, 500)
 }
-
 
 chrome.storage.sync.get(['overlaySettings'], function (result) {
     console.dir('got', result)
@@ -468,5 +473,7 @@ chrome.storage.sync.get(['overlaySettings'], function (result) {
     }
     buildSettingsObjects()
     waitForVideo()
-    //listenForPathChange()
+    elementReady(`.${TC_CLASSES.overlayButton}`, document).then(
+        listenForPathChange()
+    )
 })
