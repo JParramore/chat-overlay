@@ -12,6 +12,19 @@
     overflow: hidden;
 }
 
+.tc-overlay-clip {
+    top: 50%;
+    left: 50%;
+    height: 40%;
+    width: 40%;
+    position: absolute;
+    z-index: 2147483647;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    resize: both;
+    overflow: hidden;
+}
+
 .tc-overlay-vod-chat {
     margin-right: 0px !important;
 }
@@ -93,7 +106,7 @@
 }
 
 .tc-button-wrapper {
-    margin-right: 0.5rem;
+    padding-right: 0.5rem;
 }
 
 .tc-settings-wrapper {

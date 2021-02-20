@@ -15,8 +15,11 @@ const TC_CLASSES = {
     settingsWrapper: 'tc-settings-wrapper',
     dragButton: 'tc-drag-button',
     dragIcon: ['fa', 'fa-arrows-alt'],
+    closeButton: 'tc-close-button',
+    closeIcon: ['fas', 'fa-times'],
     overlayFrame: 'tc-chat-frame',
     fadeOut: 'tc-fade-out',
+    overlayClip: 'tc-overlay-clip',
 }
 
 const TW_CLASSES = {
@@ -240,6 +243,87 @@ const observeVodMessage = (twMessageWrapper) => {
     vodObserver.observe(twMessageWrapper, config)
 }
 
+const insertClipFrame = (node, linkEl) => {
+    let slug = linkEl.pathname.substr(1)
+
+    let button = document.createElement('button')
+    button.innerHTML = 'play clip'
+    button.onclick = () => insertClipPlayer(slug)
+    node.style.display = 'flex'
+    node.appendChild(button)
+}
+
+const insertClipPlayer = (slug) => {
+    let parentVideo = document.querySelector(`.${TW_CLASSES.videoPlayerOverlay}`)
+
+    let uid = 'uid' + Date.now()
+    let wrapper = document.createElement('div')
+    wrapper.className = TC_CLASSES.overlayClip
+    wrapper.id = (uid)
+
+    let frame = document.createElement('iframe')
+    frame.src = `https://clips.twitch.tv/embed?clip=${slug}&parent=twitch.tv&autoplay=true`
+    frame.width = '100%'
+    frame.height = '100%' 
+    frame.onload = function () {
+        let clipOverlay = this.contentWindow.document.body.querySelector(`.${TW_CLASSES.videoPlayerOverlay}`);
+        clipOverlay.style.opacity = '0.5';
+        clipOverlay.querySelector('.top-bar').remove();
+
+        clip = this.contentWindow.document.body.getElementsByTagName('video')[0];
+        clip.onended = function () {
+            wrapper.remove();
+        }
+    }
+
+    let buttonsContainer = document.createElement('div')
+
+    let dragBtn = buildDragButton(`#${uid}`)
+    let closeBtn = buildCloseButton(function() {
+        wrapper.remove()
+    })
+
+    buttonsContainer.appendChild(closeBtn)
+    buttonsContainer.appendChild(dragBtn)
+    
+    buttonsContainer.style.position = 'absolute'
+    buttonsContainer.style.top = '1rem'
+    buttonsContainer.style.left = '1rem'
+    buttonsContainer.style.display = 'none'
+
+    wrapper.onmouseover = () => {
+        wrapper.style.border = '2px solid rgb(145,71,255)'
+        buttonsContainer.style.display = 'flex'
+    }
+    wrapper.onmouseout = () => {
+        wrapper.style.border = '2px solid transparent'
+        buttonsContainer.style.display = 'none'
+    }
+
+    wrapper.appendChild(buttonsContainer)
+    wrapper.appendChild(frame)
+    parentVideo.prepend(wrapper)
+}
+
+let clipObserver = null
+const observeChatClips = (chat) => {
+    if (clipObserver) clipObserver.disconnect()
+    clipObserver = new MutationObserver(function (mutationsList, clipObserver) {
+        for (const mutation of mutationsList) {
+            mutation.addedNodes.forEach((node) => {
+                let className = node.className
+                let linkFragment = node.querySelector(`.link-fragment`)
+                if (className && linkFragment) {
+                    if ((linkFragment.hostname = 'clips.twitch.tv')) {
+                        insertClipFrame(node, linkFragment)
+                    }
+                }
+            })
+        }
+    })
+    const config = { childList: true }
+    clipObserver.observe(chat, config)
+}
 
 const setDraggable = (draggable, container, frame) => {
     let fsElement = document.querySelector('.video-player__overlay')
@@ -251,7 +335,8 @@ const setDraggable = (draggable, container, frame) => {
         pos3 = 0,
         pos4 = 0
     draggable.onmousedown = dragMouseDown
-    container.onmouseup = () => setOverlayPosition(container, container.parentElement)
+    container.onmouseup = () =>
+        setOverlayPosition(container, container.parentElement)
 
     function dragMouseDown(e) {
         videoPlayerHeight = fsElement.offsetHeight
@@ -321,11 +406,10 @@ let overlayPosition = {
     top: 0.0,
     left: 0.0,
     width: 0.5,
-    height: 0.5
+    height: 0.5,
 }
 
 const setOverlayPosition = (overlay, parent) => {
-    console.log('settin pos')
     overlayPosition.top = overlay.offsetTop / parent.offsetHeight
     overlayPosition.left = overlay.offsetLeft / parent.offsetWidth
     overlayPosition.width = overlay.offsetWidth / parent.offsetWidth

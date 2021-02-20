@@ -31,7 +31,7 @@ function buildOverlay() {
         overlayVodChat,
         settingsContainer,
     } = TC_CLASSES
-    const { toHide, display, vodChatListWrapper } = TW_CLASSES
+    const { toHide, display, vodChatListWrapper, chatScrollableArea } = TW_CLASSES
 
     let container = document.createElement('div')
     container.className = overlay
@@ -61,6 +61,9 @@ function buildOverlay() {
                     .querySelector('.chat-input')
                     .classList.add('chat-input__hide')
                 addOverlayFunctions(container, el, frameDoc.body)
+            })
+            elementReady(`.${chatScrollableArea}`, frameDoc).then(chatEl => {
+                observeChatClips(chatEl)
             })
         }
         container.prepend(frame)
@@ -187,7 +190,7 @@ function buildSliderSetting(text, min, max, value, input) {
 }
 
 function buildOverlayButtons() {
-    const { overlayButtonsContainer } = TC_CLASSES
+    const { overlayButtonsContainer, overlay, overlayFrame } = TC_CLASSES
 
     let overlayButtons = document.createElement('div')
     overlayButtons.className = overlayButtonsContainer
@@ -195,7 +198,8 @@ function buildOverlayButtons() {
     let buttons = []
 
     let overlaySettingsEl = buildOverlaySettingsButton()
-    let dragButtonEl = buildDragButton()
+    let dragButtonEl = buildDragButton(`.${overlay}`)
+
     buttons.push(overlaySettingsEl)
     buttons.push(dragButtonEl)
 
@@ -204,7 +208,7 @@ function buildOverlayButtons() {
     return overlayButtons
 }
 
-function buildDragButton() {
+function buildDragButton(toDragSelector) {
     const { coreButton, coreLabel } = TW_CLASSES.buttons
     const {
         dragButton,
@@ -235,7 +239,7 @@ function buildDragButton() {
     container.appendChild(stylesheet)
     container.appendChild(button)
 
-    elementReady(`.${overlay}`, document).then((el) => {
+    elementReady(toDragSelector, document).then((el) => {
         let frameBody = document.querySelector(`.${overlayFrame}`)
             ? document.querySelector(`.${overlayFrame}`).contentWindow.document
                   .body
@@ -275,6 +279,38 @@ function buildOverlaySettingsButton() {
 
     let icon = document.createElement('i')
     settingsIcon.forEach((className) => icon.classList.add(className))
+    coreLabel.forEach((className) => icon.classList.add(className))
+
+    button.appendChild(icon)
+    container.appendChild(stylesheet)
+    container.appendChild(button)
+
+    return container
+}
+
+function buildCloseButton(closeFunction) {
+    const { coreButton, coreLabel } = TW_CLASSES.buttons
+    const {
+        closeButton,
+        closeIcon,
+        buttonWrapper,
+    } = TC_CLASSES
+
+    let container = document.createElement('div')
+    container.className = buttonWrapper
+
+    let stylesheet = document.createElement('link')
+    stylesheet.rel = 'stylesheet'
+    stylesheet.href =
+        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'
+
+    let button = document.createElement('button')
+    button.className = closeButton
+    coreButton.forEach((className) => button.classList.add(className))
+    button.onclick = closeFunction
+
+    let icon = document.createElement('i')
+    closeIcon.forEach((className) => icon.classList.add(className))
     coreLabel.forEach((className) => icon.classList.add(className))
 
     button.appendChild(icon)
