@@ -1,6 +1,6 @@
 # Fullscreen Chat Overlay for Twitch
 
-Simple chrome extension for twitch that allows users to view twitch chat in fullscreen.
+Simple chrome extension for twitch that allows users to view and customise chat as an overlay while watching livestreams or VODs.
 
 ## Demo
 
@@ -11,7 +11,7 @@ Movable, resizable, transparent chat box overlay:
 <br>
 
 ## Features
-- Toggle overlay on and off while in fullscreen
+- Toggle overlay on and off while at all times
 - Change overlay background opacity
 - Change overlay text opacity
 - Change overlay chat message font size
@@ -32,4 +32,4 @@ Movable, resizable, transparent chat box overlay:
 ![Overlay Toggle Icon](https://i.imgur.com/CXFmi92.png)
 
 ### How to use
- Open a [twitch.tv](https://www.twitch.tv/) stream and click the purple overlay icon bottom right of the video player. Hover the overlay to change settings, move, and resize.
+ Open a [twitch.tv](https://www.twitch.tv/) stream and click the overlay icon bottom right of the video player. Hover the overlay to change settings, move, and resize.
