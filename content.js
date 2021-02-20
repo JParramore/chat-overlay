@@ -354,12 +354,13 @@ function addOverlayFunctions(overlay, buttons, frame) {
 }
 
 function updateThemeStyles() {
-    let chat, focusdoc
+    let chat, focusdoc, scrollBar
 
     if (isLive) {
         focusdoc = document.querySelector(`.${TC_CLASSES.overlayFrame}`)
             .contentWindow.document
         chat = focusdoc.querySelector(`.${TW_CLASSES.chatRoom}`)
+        scrollBar = focusdoc.querySelector(`.${TW_CLASSES.scrollBar}`)
     } else {
         focusdoc = document
         chat = document.querySelector(`.${TC_CLASSES.overlayVodChat}`)
@@ -392,6 +393,8 @@ function updateThemeStyles() {
     } else {
         chat.style.color = darkMode ? 'white' : 'black'
     }
+
+    if (scrollBar) scrollBar.style.opacity = alpha / 100
 
     chrome.storage.local.set({ overlaySettings: settings })
 }
