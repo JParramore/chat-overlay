@@ -442,7 +442,7 @@ function waitForVideo() {
     const timeNow = Date.now()
     const int = setInterval(() => {
         if (Date.now() - timeNow > 100000000) {
-            console.log('waitForVideo timed out')
+            console.err('timed out: waiting for video')
             clearInterval(int)
         }
         let controls = document.querySelector(`.${playerControls}`),
@@ -460,7 +460,7 @@ function waitForVideo() {
                 init()
                 clearInterval(int)
             } else {
-                console.log('controls and chat found but not live or vod?')
+                console.err('controls & chat found but not live or VOD')
             }
         }
     }, 500)

@@ -358,13 +358,3 @@ const animateShowComponent = (ElSelector, offsetElSelector) => {
         }
     }
 }
-
-// globalThis.overlay = {
-//     TW_CLASSES,
-//     TC_CLASSES,
-//     OVERLAY_BTN_SVG,
-//     settings,
-//     elementReady,
-//     observeVodMessage,
-//     setDraggable
-// }
