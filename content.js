@@ -5,9 +5,6 @@ function init() {
     const { playerControls, videoPlayerOverlay } = TW_CLASSES
     let coreComponents = []
 
-    // Garbage collect extension components
-    document.querySelectorAll(`.${core}`).forEach((element) => element.remove())
-
     let video = document.querySelector(`.${videoPlayerOverlay}`)
     let overlayEl = buildOverlay()
     video.appendChild(overlayEl)
@@ -19,6 +16,12 @@ function init() {
     coreComponents.push(overlayButtonEl)
     coreComponents.push(overlayEl)
     coreComponents.forEach((element) => element.classList.add(core))
+}
+
+function garbageCollect() {
+    document
+        .querySelectorAll(`.${TC_CLASSES.core}`)
+        .forEach((element) => element.remove())
 }
 
 function buildOverlay() {
@@ -450,23 +453,27 @@ function waitForVideo() {
         if (controls && chat) {
             let isLiveChat = !!document.querySelector(`.${liveChat}`)
             let isVodChat = !!document.querySelector(`.${vodChat}`)
+
             if (isVodChat && window.location.pathname.includes('videos')) {
                 isLive = false
                 init(false)
                 clearInterval(int)
+                elementReady(`.${TC_CLASSES.overlayButton}`, document).then(
+                    detectNeedGC()
+                )
             } else if (isLiveChat) {
                 isLive = true
                 init()
                 clearInterval(int)
-            } else {
-                console.error('controls & chat found but not live or VOD')
-                clearInterval(int) // break?
+                elementReady(`.${TC_CLASSES.overlayButton}`, document).then(
+                    detectNeedGC()
+                )
             }
         }
     }, 500)
 }
 
-function listenForPathChange() {
+function detectNeedGC() {
     let location = window.location.pathname
 
     const int = setInterval(() => {
@@ -474,21 +481,16 @@ function listenForPathChange() {
             `.${TC_CLASSES.overlayButton}`
         )
         if (!overlayButton) {
-            let overlayEl = document.querySelector(`.${TC_CLASSES.overlay}`)
-            if (overlayEl) overlayEl.style.display = 'none'
-            waitForVideo()
+            garbageCollect()
+            console.log('controls gone wait for video')
             clearInterval(int)
-            elementReady(`.${TC_CLASSES.overlayButton}`, document).then(
-                listenForPathChange()
-            )
+            waitForVideo()
         } else if (location !== window.location.pathname) {
             location = window.location.pathname
             console.log('path changed.. wait for video')
-            waitForVideo()
+            garbageCollect()
             clearInterval(int)
-            elementReady(`.${TC_CLASSES.overlayButton}`, document).then(
-                listenForPathChange()
-            )
+            waitForVideo()
         }
     }, 500)
 }
@@ -502,18 +504,15 @@ chrome.storage.local.get(['overlaySettings'], function (result) {
     }
     buildSettingsObjects()
     waitForVideo()
-    elementReady(`.${TC_CLASSES.overlayButton}`, document).then(
-        listenForPathChange()
-    )
-
-    document.onkeydown = function (e) {
-        if (
-            e.key.toLowerCase() === 'o' &&
-            e.target.tagName.toLowerCase() === 'body'
-        ) {
-            toggleShowOverlay()
-        }
-    }
-
-    document.onfullscreenchange = translateOverlayPosition
 })
+
+document.onkeydown = function (e) {
+    if (
+        e.key.toLowerCase() === 'o' &&
+        e.target.tagName.toLowerCase() === 'body'
+    ) {
+        toggleShowOverlay()
+    }
+}
+
+document.onfullscreenchange = translateOverlayPosition
