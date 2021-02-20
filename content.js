@@ -482,12 +482,10 @@ function detectNeedGC() {
         )
         if (!overlayButton) {
             garbageCollect()
-            console.log('controls gone wait for video')
             clearInterval(int)
             waitForVideo()
         } else if (location !== window.location.pathname) {
             location = window.location.pathname
-            console.log('path changed.. wait for video')
             garbageCollect()
             clearInterval(int)
             waitForVideo()
@@ -496,7 +494,6 @@ function detectNeedGC() {
 }
 
 chrome.storage.local.get(['overlaySettings'], function (result) {
-    console.dir('got', result)
     if (result && Object.keys(result).length === 0) {
         settings = DEFAULT_SETTINGS
     } else {
