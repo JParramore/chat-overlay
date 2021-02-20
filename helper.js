@@ -337,7 +337,7 @@ const observeChatClips = (chat) => {
                 let className = node.className
                 let linkFragment = node.querySelector(`.link-fragment`)
                 if (className && linkFragment) {
-                    if ((linkFragment.hostname = 'clips.twitch.tv')) {
+                    if ((linkFragment.hostname === 'clips.twitch.tv')) {
                         insertPlayClipButton(node, linkFragment)
                     }
                 }
