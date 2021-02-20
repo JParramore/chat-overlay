@@ -306,10 +306,10 @@ function buildToggleOverlayButton() {
     return container
 }
 
-function toggleShowOverlay () {
+function toggleShowOverlay() {
     let overlayEl = document.querySelector(`.${TC_CLASSES.overlay}`)
     let overlayBtnEl = document.querySelector(`.${TC_CLASSES.overlayButton}`)
-    if(overlayEl && overlayBtnEl) {
+    if (overlayEl && overlayBtnEl) {
         const hidden =
             !overlayEl.style.display || overlayEl.style.display === 'none'
         if (hidden) {
@@ -434,7 +434,6 @@ function translateOverlayPosition() {
         overlayEl.style.height = `${height * 100}%`
         overlayEl.style.width = `${width * 100}%`
     }
-
 }
 
 function waitForVideo() {
@@ -442,7 +441,7 @@ function waitForVideo() {
     const timeNow = Date.now()
     const int = setInterval(() => {
         if (Date.now() - timeNow > 100000000) {
-            console.err('timed out: waiting for video')
+            console.errpr('timed out: waiting for video')
             clearInterval(int)
         }
         let controls = document.querySelector(`.${playerControls}`),
@@ -451,7 +450,7 @@ function waitForVideo() {
         if (controls && chat) {
             let isLiveChat = !!document.querySelector(`.${liveChat}`)
             let isVodChat = !!document.querySelector(`.${vodChat}`)
-            if (isVodChat) {
+            if (isVodChat && window.location.pathname.includes('videos')) {
                 isLive = false
                 init(false)
                 clearInterval(int)
@@ -460,7 +459,8 @@ function waitForVideo() {
                 init()
                 clearInterval(int)
             } else {
-                console.err('controls & chat found but not live or VOD')
+                console.error('controls & chat found but not live or VOD')
+                clearInterval(int) // break?
             }
         }
     }, 500)
@@ -473,10 +473,17 @@ function listenForPathChange() {
         let overlayButton = document.querySelector(
             `.${TC_CLASSES.overlayButton}`
         )
-
         if (!overlayButton) {
             let overlayEl = document.querySelector(`.${TC_CLASSES.overlay}`)
             if (overlayEl) overlayEl.style.display = 'none'
+            waitForVideo()
+            clearInterval(int)
+            elementReady(`.${TC_CLASSES.overlayButton}`, document).then(
+                listenForPathChange()
+            )
+        } else if (location !== window.location.pathname) {
+            location = window.location.pathname
+            console.log('path changed.. wait for video')
             waitForVideo()
             clearInterval(int)
             elementReady(`.${TC_CLASSES.overlayButton}`, document).then(
@@ -498,9 +505,12 @@ chrome.storage.local.get(['overlaySettings'], function (result) {
     elementReady(`.${TC_CLASSES.overlayButton}`, document).then(
         listenForPathChange()
     )
-    
-    document.onkeydown = function(e) {
-        if (e.key.toLowerCase() === 'o' && e.target.tagName.toLowerCase() === 'body'){
+
+    document.onkeydown = function (e) {
+        if (
+            e.key.toLowerCase() === 'o' &&
+            e.target.tagName.toLowerCase() === 'body'
+        ) {
             toggleShowOverlay()
         }
     }
