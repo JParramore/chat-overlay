@@ -27,3 +27,7 @@ body {
 .simplebar-content {
     padding-bottom: 5px !important;
 }
+
+button[data-a-target="chat-settings"] {
+    display: none;
+}

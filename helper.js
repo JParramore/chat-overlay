@@ -214,7 +214,8 @@ const observeVodMessage = (twMessageWrapper) => {
     vodObserver = new MutationObserver(function (mutationsList, vodObserver) {
         for (const mutation of mutationsList) {
             mutation.addedNodes.forEach((node) => {
-                if (window.location.pathname !== pathname) vodObserver.disconnect()
+                if (window.location.pathname !== pathname)
+                    vodObserver.disconnect()
                 if (node.matches(`li[class="tw-full-width`)) {
                     let listContainer = document.querySelector(
                         `.${TC_CLASSES.overlayVodChat} ul`
@@ -238,7 +239,6 @@ const observeVodMessage = (twMessageWrapper) => {
     const config = { childList: true, subtree: true }
     vodObserver.observe(twMessageWrapper, config)
 }
-
 
 const setDraggable = (draggable, container, frame) => {
     let fsElement = document.querySelector('.video-player__overlay')
@@ -291,12 +291,14 @@ const setDraggable = (draggable, container, frame) => {
             container.style.left = '0px'
         }
         if (container.offsetTop + container.offsetHeight > videoPlayerHeight) {
-            container.style.top = `${videoPlayerHeight - container.offsetHeight
-                }px`
+            container.style.top = `${
+                videoPlayerHeight - container.offsetHeight
+            }px`
         }
         if (container.offsetLeft + container.offsetWidth > videoPlayerWidth) {
-            container.style.left = `${videoPlayerWidth - container.offsetWidth
-                }px`
+            container.style.left = `${
+                videoPlayerWidth - container.offsetWidth
+            }px`
         }
     }
 
