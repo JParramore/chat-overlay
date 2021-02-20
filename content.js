@@ -148,6 +148,7 @@ function buildToggleSetting(text, checked, id, onchange) {
     let textEl = document.createElement('span')
     textEl.innerHTML = text
     textEl.style.paddingRight = '1rem'
+    textEl.style.color = 'white'
 
     let input = document.createElement('input')
     input.type = 'checkbox'
@@ -178,6 +179,7 @@ function buildSliderSetting(text, min, max, value, input) {
 
     let label = document.createElement('span')
     label.innerHTML = text
+    label.style.color = 'white'
     label.style.paddingRight = '1rem'
 
     slider = document.createElement('input')
