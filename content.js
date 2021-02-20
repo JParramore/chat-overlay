@@ -393,7 +393,7 @@ function updateThemeStyles() {
         chat.style.color = darkMode ? 'white' : 'black'
     }
 
-    chrome.storage.sync.set({ overlaySettings: settings })
+    chrome.storage.local.set({ overlaySettings: settings })
 }
 
 function updateChatStyles() {
@@ -412,7 +412,7 @@ function updateChatStyles() {
     chat.style.fontWeight = bold ? 'bold' : 'normal'
     chat.style.opacity = opacity / 100
 
-    chrome.storage.sync.set({ overlaySettings: settings })
+    chrome.storage.local.set({ overlaySettings: settings })
 }
 
 function waitForVideo() {
@@ -464,7 +464,7 @@ function listenForPathChange() {
     }, 500)
 }
 
-chrome.storage.sync.get(['overlaySettings'], function (result) {
+chrome.storage.local.get(['overlaySettings'], function (result) {
     console.dir('got', result)
     if (result && Object.keys(result).length === 0) {
         settings = DEFAULT_SETTINGS
