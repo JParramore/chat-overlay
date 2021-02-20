@@ -291,9 +291,25 @@ function buildToggleOverlayButton() {
 
     let button = document.createElement('button')
     button.classList.add(...twButtonClasses)
-    button.ariaLabel = 'Chat Overlay'
-    button.onclick = (e) => {
-        let overlayEl = document.querySelector(`.${overlay}`)
+    button.ariaLabel = 'Chat Overlay (o)'
+    button.onclick = toggleShowOverlay
+
+    let tooltip = document.createElement('div')
+    tooltip.className = 'tw-tooltip tw-tooltip--align-right tw-tooltip--up'
+    tooltip.role = 'tooltip'
+    tooltip.innerHTML = 'Chat Overlay (o)'
+
+    button.innerHTML = OVERLAY_BTN_SVG
+    container.appendChild(button)
+    container.appendChild(tooltip)
+
+    return container
+}
+
+function toggleShowOverlay () {
+    let overlayEl = document.querySelector(`.${TC_CLASSES.overlay}`)
+    let overlayBtnEl = document.querySelector(`.${TC_CLASSES.overlayButton}`)
+    if(overlayEl && overlayBtnEl) {
         const hidden =
             !overlayEl.style.display || overlayEl.style.display === 'none'
         if (hidden) {
@@ -303,17 +319,6 @@ function buildToggleOverlayButton() {
             overlayEl.style.display = 'none'
         }
     }
-
-    let tooltip = document.createElement('div')
-    tooltip.className = 'tw-tooltip tw-tooltip--align-right tw-tooltip--up'
-    tooltip.role = 'tooltip'
-    tooltip.innerHTML = 'Chat Overlay'
-
-    button.innerHTML = OVERLAY_BTN_SVG
-    container.appendChild(button)
-    container.appendChild(tooltip)
-
-    return container
 }
 
 function flashFade(el) {
@@ -479,4 +484,10 @@ chrome.storage.local.get(['overlaySettings'], function (result) {
     elementReady(`.${TC_CLASSES.overlayButton}`, document).then(
         listenForPathChange()
     )
+    
+    document.onkeydown = function(e) {
+        if (e.key.toLowerCase() === 'o' && e.target.tagName.toLowerCase() === 'body'){
+            toggleShowOverlay()
+        }
+    }
 })
