@@ -31,3 +31,7 @@ body {
 button[data-a-target="chat-settings"] {
     display: none;
 }
+
+.bttv-split-chat-alt-bg {
+    background-color: transparent !important;
+}
