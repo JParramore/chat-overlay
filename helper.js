@@ -91,7 +91,7 @@ const DEFAULT_SETTINGS = {
             green: 255,
             blue: 255,
         },
-        alpha: 25,
+        alpha: 50,
     },
     chat: {
         fontSize: 14,
@@ -240,6 +240,7 @@ const observeVodMessage = (twMessageWrapper) => {
     vodObserver.observe(twMessageWrapper, config)
 }
 
+
 const setDraggable = (draggable, container, frame) => {
     let fsElement = document.querySelector('.video-player__overlay')
     let videoPlayerHeight = null,
@@ -250,6 +251,7 @@ const setDraggable = (draggable, container, frame) => {
         pos3 = 0,
         pos4 = 0
     draggable.onmousedown = dragMouseDown
+    container.onmouseup = () => setOverlayPosition(container, container.parentElement)
 
     function dragMouseDown(e) {
         videoPlayerHeight = fsElement.offsetHeight
@@ -306,7 +308,6 @@ const setDraggable = (draggable, container, frame) => {
         // stop moving when mouse button is released:
         document.onmouseup = null
         document.onmousemove = null
-
         setOverlayPosition(container, container.parentElement)
 
         if (frame) {
@@ -324,6 +325,7 @@ let overlayPosition = {
 }
 
 const setOverlayPosition = (overlay, parent) => {
+    console.log('settin pos')
     overlayPosition.top = overlay.offsetTop / parent.offsetHeight
     overlayPosition.left = overlay.offsetLeft / parent.offsetWidth
     overlayPosition.width = overlay.offsetWidth / parent.offsetWidth

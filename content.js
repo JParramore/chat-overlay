@@ -512,4 +512,5 @@ document.onkeydown = function (e) {
     }
 }
 
+
 document.onfullscreenchange = translateOverlayPosition
