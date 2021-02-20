@@ -31,7 +31,12 @@ function buildOverlay() {
         overlayVodChat,
         settingsContainer,
     } = TC_CLASSES
-    const { toHide, display, vodChatListWrapper, chatScrollableArea } = TW_CLASSES
+    const {
+        toHide,
+        display,
+        vodChatListWrapper,
+        chatScrollableArea,
+    } = TW_CLASSES
 
     let container = document.createElement('div')
     container.className = overlay
@@ -62,7 +67,7 @@ function buildOverlay() {
                     .classList.add('chat-input__hide')
                 addOverlayFunctions(container, el, frameDoc.body)
             })
-            elementReady(`.${chatScrollableArea}`, frameDoc).then(chatEl => {
+            elementReady(`.${chatScrollableArea}`, frameDoc).then((chatEl) => {
                 observeChatClips(chatEl)
             })
         }
@@ -240,11 +245,8 @@ function buildDragButton(toDragSelector) {
     container.appendChild(button)
 
     elementReady(toDragSelector, document).then((el) => {
-        let frameBody = document.querySelector(`.${overlayFrame}`)
-            ? document.querySelector(`.${overlayFrame}`).contentWindow.document
-                  .body
-            : null
-        setDraggable(container, el, frameBody)
+        let frame = document.querySelector(`.${overlayFrame}`)
+        setDraggable(container, el, frame)
     })
 
     return container
@@ -290,11 +292,7 @@ function buildOverlaySettingsButton() {
 
 function buildCloseButton(closeFunction) {
     const { coreButton, coreLabel } = TW_CLASSES.buttons
-    const {
-        closeButton,
-        closeIcon,
-        buttonWrapper,
-    } = TC_CLASSES
+    const { closeButton, closeIcon, buttonWrapper } = TC_CLASSES
 
     let container = document.createElement('div')
     container.className = buttonWrapper
@@ -547,6 +545,5 @@ document.onkeydown = function (e) {
         toggleShowOverlay()
     }
 }
-
 
 document.onfullscreenchange = translateOverlayPosition

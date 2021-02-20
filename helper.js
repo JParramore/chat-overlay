@@ -17,6 +17,7 @@ const TC_CLASSES = {
     dragIcon: ['fa', 'fa-arrows-alt'],
     closeButton: 'tc-close-button',
     closeIcon: ['fas', 'fa-times'],
+    playIcon: ['fas', 'fa-play-circle'],
     overlayFrame: 'tc-chat-frame',
     fadeOut: 'tc-fade-out',
     overlayClip: 'tc-overlay-clip',
@@ -243,14 +244,35 @@ const observeVodMessage = (twMessageWrapper) => {
     vodObserver.observe(twMessageWrapper, config)
 }
 
-const insertClipFrame = (node, linkEl) => {
+const insertPlayClipButton = (node, linkEl) => {
     let slug = linkEl.pathname.substr(1)
 
+    let wrapper = document.createElement('div')
+    wrapper.style.paddingLeft = '1rem'
+    wrapper.style.display = 'flex'
+    wrapper.style.alignItems = 'center'
+
+    let stylesheet = document.createElement('link')
+    stylesheet.rel = 'stylesheet'
+    stylesheet.href =
+        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'
+    
+    let label = document.createElement('span')
+    label.style.fontSize = '24px'
+    let icon = document.createElement('i')
+    TC_CLASSES.playIcon.forEach(className => icon.classList.add(className))
+    label.appendChild(icon)
+    TW_CLASSES.buttons.coreLabel.forEach(className => label.classList.add(className))
+
     let button = document.createElement('button')
-    button.innerHTML = 'play clip'
+    TW_CLASSES.buttons.overlayButton.forEach(className => button.classList.add(className))
     button.onclick = () => insertClipPlayer(slug)
+
+    wrapper.appendChild(stylesheet)
+    wrapper.appendChild(button)
+    button.appendChild(label)
     node.style.display = 'flex'
-    node.appendChild(button)
+    node.appendChild(wrapper)
 }
 
 const insertClipPlayer = (slug) => {
@@ -259,6 +281,7 @@ const insertClipPlayer = (slug) => {
     let uid = 'uid' + Date.now()
     let wrapper = document.createElement('div')
     wrapper.className = TC_CLASSES.overlayClip
+    wrapper.classList.add(TC_CLASSES.core)
     wrapper.id = (uid)
 
     let frame = document.createElement('iframe')
@@ -315,7 +338,7 @@ const observeChatClips = (chat) => {
                 let linkFragment = node.querySelector(`.link-fragment`)
                 if (className && linkFragment) {
                     if ((linkFragment.hostname = 'clips.twitch.tv')) {
-                        insertClipFrame(node, linkFragment)
+                        insertPlayClipButton(node, linkFragment)
                     }
                 }
             })
@@ -335,8 +358,9 @@ const setDraggable = (draggable, container, frame) => {
         pos3 = 0,
         pos4 = 0
     draggable.onmousedown = dragMouseDown
+
     container.onmouseup = () =>
-        setOverlayPosition(container, container.parentElement)
+        setOverlayPosition()
 
     function dragMouseDown(e) {
         videoPlayerHeight = fsElement.offsetHeight
@@ -350,9 +374,10 @@ const setDraggable = (draggable, container, frame) => {
         document.onmouseup = closeDragElement
         // call a function whenever the cursor moves:
         document.onmousemove = elementDrag
-        if (frame) {
-            //frame.onmousemove = elementDrag
-            frame.onmouseup = closeDragElement
+
+        let frameBody = frame.contentWindow.document.body
+        if (frameBody) {
+            frameBody.onmouseup = closeDragElement
         }
     }
 
@@ -371,6 +396,7 @@ const setDraggable = (draggable, container, frame) => {
         container.style.top = offsetTop + 'px'
         container.style.left = offsetLeft + 'px'
 
+        // keep position within edges of videoplayer
         if (container.offsetTop < 0) {
             container.style.top = '0px'
         }
@@ -393,11 +419,11 @@ const setDraggable = (draggable, container, frame) => {
         // stop moving when mouse button is released:
         document.onmouseup = null
         document.onmousemove = null
-        setOverlayPosition(container, container.parentElement)
+        setOverlayPosition()
 
-        if (frame) {
-            //frame.onmousemove = null
-            frame.onmouseup = null
+        let frameBody = frame.contentWindow.document.body
+        if (frameBody) {
+            frameBody.onmouseup = null
         }
     }
 }
@@ -409,7 +435,10 @@ let overlayPosition = {
     height: 0.5,
 }
 
-const setOverlayPosition = (overlay, parent) => {
+const setOverlayPosition = () => {
+    let overlay = document.querySelector(`.${TC_CLASSES.overlay}`)
+    let parent = overlay.parentElement
+
     overlayPosition.top = overlay.offsetTop / parent.offsetHeight
     overlayPosition.left = overlay.offsetLeft / parent.offsetWidth
     overlayPosition.width = overlay.offsetWidth / parent.offsetWidth
