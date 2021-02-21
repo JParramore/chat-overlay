@@ -108,7 +108,7 @@ function buildOverlay() {
 }
 
 function buildOverlaySettings() {
-    const { settingsWrapper } = TC_CLASSES
+    const { settingsWrapper, settingsHeader } = TC_CLASSES
 
     let container = document.createElement('div')
     container.style.paddingTop = '1rem'
@@ -116,8 +116,16 @@ function buildOverlaySettings() {
     let wrapper = document.createElement('div')
     wrapper.className = settingsWrapper
 
-    container.appendChild(wrapper)
+    let header = document.createElement('div')
+    header.className = settingsHeader
 
+    let title = document.createElement('span')
+    title.innerHTML = 'Overlay Settings'
+
+    header.appendChild(title)
+    wrapper.appendChild(header)
+
+    container.appendChild(wrapper)
     const sliders = Object.keys(settingsElements.sliders)
     const toggles = Object.keys(settingsElements.toggles)
 

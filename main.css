@@ -1,8 +1,8 @@
 .tc-overlay {
     height: 30%;
     width: 50%;
-    min-width: 270px;
-    min-height: 170px;
+    min-width: 285px;
+    min-height: 200px;
     position: absolute;
     z-index: 2147483646;
     border: 2px solid transparent;
@@ -43,6 +43,14 @@
     background-color: rgba(145,71,255,0.5);
 }
 
+.tc-settings-header {
+    display: flex;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    padding-bottom: 1rem;
+}
+
 .tc-drag-button,
 .tc-settings-button {
     display: inline-flex;
@@ -79,13 +87,14 @@
     padding-left: 1rem;
     padding-bottom: 1rem;
     top: -40px;
+    width: 270px;
     visibility: hidden;
 }
 
 .tc-setting {
     display: flex;
-    font-weight: bold;
     justify-content: space-between;
+    padding-bottom: 0.5rem;
 }
 
 .tc-overlay input[type="range"] {

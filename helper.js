@@ -9,6 +9,7 @@ const TC_CLASSES = {
     buttonWrapper: 'tc-button-wrapper',
     vodMessage: 'tc-vod-message',
     settingContainer: 'tc-setting',
+    settingsHeader: 'tc-settings-header',
     settingsButton: 'tc-settings-button',
     settingsIcon: ['fas', 'fa-cog'],
     settingsContainer: 'tc-settings-container',
@@ -477,16 +478,16 @@ const animateShowComponent = (ElSelector, offsetElSelector) => {
         elem.classList.remove('tc-closed')
         elem.classList.add('tc-open')
     }
-
+    let posInterval = offset / 100
     var pos = 0
     let start = elem.offsetTop
-    var id = setInterval(frame, 10)
+    var id = setInterval(frame, 2)
     let moveDistance = offset
     function frame() {
         if (pos >= moveDistance) {
             clearInterval(id)
         } else {
-            pos += 10
+            pos += posInterval
             elem.style.top = isOpen ? `${start + pos}px` : `${start - pos}px`
         }
     }
