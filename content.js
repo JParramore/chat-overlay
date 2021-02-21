@@ -68,7 +68,7 @@ function buildOverlay() {
                 addOverlayFunctions(container, el, frameDoc.body)
             })
             elementReady(`.${chatScrollableArea}`, frameDoc).then((chatEl) => {
-                observeChatClips(chatEl)
+                observeLiveChat(chatEl)
             })
         }
         container.prepend(frame)
@@ -77,7 +77,7 @@ function buildOverlay() {
             let wrapper = document.querySelector(`.${vodChatListWrapper}`)
             let clone = wrapper.cloneNode(true)
             clone.classList.add(overlayVodChat)
-            observeVodMessage(wrapper)
+            observeVodChat(wrapper)
             container.prepend(clone)
         })
     }
@@ -461,6 +461,16 @@ function updateChatStyles() {
     } else {
         chat = document.querySelector(`.${TC_CLASSES.overlayVodChat} ul`)
     }
+
+    const removeBadges = settings.chat.removeBadges
+    let badges = chat.querySelectorAll(
+        '.chat-badge, a[data-a-target="chat-badge"]'
+    )
+    badges.forEach((badge) =>
+        removeBadges
+            ? badge.classList.add(TC_CLASSES.chatBadgeHide)
+            : badge.classList.remove(TC_CLASSES.chatBadgeHide)
+    )
 
     const darkMode = settings.theme.darkMode
     const { opacity, bold, fontSize, outline } = settings.chat

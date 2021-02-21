@@ -124,6 +124,10 @@
     padding: 0.5rem 1rem 0.5rem 1rem;
 }
 
+.tc-chat-badge-hide {
+    display: none;
+}
+
 .svg-icon {
     width: 20px;
     height: 20px;

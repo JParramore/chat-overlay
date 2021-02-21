@@ -22,6 +22,7 @@ const TC_CLASSES = {
     overlayFrame: 'tc-chat-frame',
     fadeOut: 'tc-fade-out',
     overlayClip: 'tc-overlay-clip',
+    chatBadgeHide: 'tc-chat-badge-hide',
 }
 
 const TW_CLASSES = {
@@ -103,6 +104,7 @@ const DEFAULT_SETTINGS = {
         bold: false,
         opacity: 100,
         outline: false,
+        removeBadges: false,
     },
 }
 
@@ -180,6 +182,17 @@ const buildSettingsObjects = () => {
                     updateChatStyles()
                 },
             },
+            removeBadges: {
+                name: 'removeBadges',
+                type: 'toggles',
+                label: 'Remove Badges',
+                checked: settings.chat.removeBadges,
+                id: 'over-chat-settings-badges',
+                onchange: function () {
+                    settings.chat.removeBadges = this.checked
+                    updateChatStyles()
+                },
+            },
         },
     }
 }
@@ -223,43 +236,94 @@ const elementRemoved = (selector, doc) => {
     })
 }
 
+let clipObserver = null
+const observeLiveChat = (chat) => {
+    if (clipObserver) clipObserver.disconnect()
+    clipObserver = new MutationObserver(function (mutationsList, clipObserver) {
+        for (const mutation of mutationsList) {
+            mutation.addedNodes.forEach((node) => {
+                let className = node.className
+                let linkFragments = node.querySelectorAll(`.link-fragment`)
+                let badges =
+                    node.querySelectorAll(
+                        '.chat-badge, a[data-a-target="chat-badge"]'
+                    ) || []
+
+                if (linkFragments.length > 0)
+                    linkClips(node, className, linkFragments)
+                if (settings.chat.removeBadges)
+                    badges.forEach((badge) =>
+                        badge.classList.add(`${TC_CLASSES.chatBadgeHide}`)
+                    )
+            })
+        }
+    })
+    const config = { childList: true }
+    clipObserver.observe(chat, config)
+
+    function linkClips(node, className, linkFragments) {
+        for (const linkFragment of linkFragments) {
+            if (className && linkFragment) {
+                if (linkFragment.hostname === 'clips.twitch.tv') {
+                    let slug = linkFragment.pathname.substr(1)
+                    insertPlayClipButton(node, slug)
+                    break
+                } else if (linkFragment.hostname === 'www.twitch.tv') {
+                    let re = /^[/]\w+(\/clip\/)[a-zA-Z]+$/
+                    if (re.test(linkFragment.pathname)) {
+                        let slug = linkFragment.pathname.split('/')[3]
+                        insertPlayClipButton(node, slug)
+                        break
+                    }
+                }
+            }
+        }
+    }
+}
+
 let vodObserver = null
-const observeVodMessage = (twMessageWrapper) => {
+const observeVodChat = (twMessageWrapper) => {
     let pathname = window.location.pathname
-    let countLines = 0
     if (vodObserver) vodObserver.disconnect()
     vodObserver = new MutationObserver(function (mutationsList, vodObserver) {
         for (const mutation of mutationsList) {
             mutation.addedNodes.forEach((node) => {
                 if (window.location.pathname !== pathname)
                     vodObserver.disconnect()
-                if (node.matches(`li[class="tw-full-width`)) {
-                    let listContainer = document.querySelector(
-                        `.${TC_CLASSES.overlayVodChat} ul`
-                    )
-                    let clone = node.cloneNode(true)
-                    clone.classList.add(TC_CLASSES.vodMessage)
-                    if (countLines > 100) listContainer.childNodes[0].remove()
-
-                    listContainer.appendChild(clone)
-                    countLines += 1
-
-                    let tcChat = document.querySelector(
-                        `.${TW_CLASSES.overlayVodChat}`
-                    )
-                    if (tcChat && tcChat.scrollHeight)
-                        tcChat.scrollTop = tcChat.scrollHeight
-                }
+                if (node.matches(`li[class="tw-full-width`)) addNewMessage(node)
             })
         }
     })
     const config = { childList: true, subtree: true }
     vodObserver.observe(twMessageWrapper, config)
+
+    function addNewMessage(node) {
+        let listContainer = document.querySelector(
+            `.${TC_CLASSES.overlayVodChat} ul`
+        )
+        let clone = node.cloneNode(true)
+        clone.classList.add(TC_CLASSES.vodMessage)
+
+        let badges =
+            clone.querySelectorAll(
+                '.chat-badge, a[data-a-target="chat-badge"]'
+            ) || []
+        if (settings.chat.removeBadges)
+            badges.forEach((badge) =>
+                badge.classList.add(`${TC_CLASSES.chatBadgeHide}`)
+            )
+        listContainer.appendChild(clone)
+
+        let count = listContainer.childNodes.length
+        while (count-- > 100) listContainer.firstChild.remove()
+        
+        let tcChat = document.querySelector(`.${TW_CLASSES.overlayVodChat}`)
+        if (tcChat && tcChat.scrollHeight)
+            tcChat.scrollTop = tcChat.scrollHeight
+    }
 }
 
 const insertPlayClipButton = (node, slug) => {
-    //let slug = linkEl.pathname.substr(1)
-
     let wrapper = document.createElement('div')
     wrapper.style.paddingLeft = '1rem'
     wrapper.style.display = 'flex'
@@ -347,37 +411,6 @@ const insertClipPlayer = (slug) => {
     wrapper.appendChild(buttonsContainer)
     wrapper.appendChild(frame)
     parentVideo.prepend(wrapper)
-}
-
-let clipObserver = null
-const observeChatClips = (chat) => {
-    if (clipObserver) clipObserver.disconnect()
-    clipObserver = new MutationObserver(function (mutationsList, clipObserver) {
-        for (const mutation of mutationsList) {
-            mutation.addedNodes.forEach((node) => {
-                let className = node.className
-                let linkFragments = node.querySelectorAll(`.link-fragment`)
-                for (const linkFragment of linkFragments) {
-                    if (className && linkFragment) {
-                        if (linkFragment.hostname === 'clips.twitch.tv') {
-                            let slug = linkEl.pathname.substr(1)
-                            insertPlayClipButton(node, slug)
-                            break
-                        } else if (linkFragment.hostname === 'www.twitch.tv') {
-                            let re = /^[/]\w+(\/clip\/)[a-zA-Z]+$/
-                            if (re.test(linkFragment.pathname)) {
-                                let slug = linkFragment.pathname.split('/')[3]
-                                insertPlayClipButton(node, slug)
-                                break
-                            }
-                        }
-                    }
-                }
-            })
-        }
-    })
-    const config = { childList: true }
-    clipObserver.observe(chat, config)
 }
 
 const setDraggable = (draggable, container, frame) => {

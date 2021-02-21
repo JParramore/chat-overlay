@@ -35,3 +35,7 @@ button[data-a-target="chat-settings"] {
 .bttv-split-chat-alt-bg {
     background-color: transparent !important;
 }
+
+.tc-chat-badge-hide {
+    display: none;
+}
