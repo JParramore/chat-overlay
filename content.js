@@ -523,8 +523,8 @@ const updateOverlayPosition = () => {
         : (settings.position = DEFAULT_SETTINGS.position)
 
     // sanity check border overflowing video player
-    if (current.width + current.left > 1) current.left = 1.0 - current.width
-    if (current.height + current.top > 1) current.top = 1.0 - current.height
+    if (current.width + current.left > 1) settings.position = DEFAULT_SETTINGS.position
+    if (current.height + current.top > 1) settings.position = DEFAULT_SETTINGS.position
 
     chrome.storage.local.set({ overlaySettings: settings })
 }
