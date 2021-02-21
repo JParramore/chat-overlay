@@ -1,7 +1,8 @@
 let isLive = true
 
+// build core components and append to tw video player
 function init() {
-    const { core, overlayButton } = TC_CLASSES
+    const { core } = TC_CLASSES
     const { playerControls, videoPlayerOverlay } = TW_CLASSES
     let coreComponents = []
 
@@ -18,12 +19,14 @@ function init() {
     coreComponents.forEach((element) => element.classList.add(core))
 }
 
+// sanity check - remove core components on rebuild
 function garbageCollect() {
     document
         .querySelectorAll(`.${TC_CLASSES.core}`)
         .forEach((element) => element.remove())
 }
 
+// build overlay chat container and components
 function buildOverlay() {
     const {
         overlay,
@@ -107,6 +110,7 @@ function buildOverlay() {
     return container
 }
 
+// using settingsElements obj build settings
 function buildOverlaySettings() {
     const { settingsWrapper, settingsHeader } = TC_CLASSES
 
@@ -204,6 +208,7 @@ function buildSliderSetting(text, min, max, value, input) {
     return container
 }
 
+// build the settings and drag buttons for the overlay
 function buildOverlayButtons() {
     const { overlayButtonsContainer, overlay, overlayFrame } = TC_CLASSES
 
@@ -329,7 +334,7 @@ function buildCloseButton(closeFunction) {
 }
 
 function buildToggleOverlayButton() {
-    const { overlayButton, overlay } = TC_CLASSES
+    const { overlayButton } = TC_CLASSES
     const twButtonClasses = TW_CLASSES.buttons.overlayButton
 
     let container = document.createElement('div')
@@ -353,6 +358,7 @@ function buildToggleOverlayButton() {
     return container
 }
 
+// show or hide the overlay
 function toggleShowOverlay() {
     let overlayEl = document.querySelector(`.${TC_CLASSES.overlay}`)
     let overlayBtnEl = document.querySelector(`.${TC_CLASSES.overlayButton}`)
@@ -368,6 +374,7 @@ function toggleShowOverlay() {
     }
 }
 
+// animation on element to flash into view
 function flashFade(el) {
     let box = document.createElement('div')
     box.className = 'tc-flash-fade'
@@ -386,6 +393,7 @@ function flashFade(el) {
     }, 60)
 }
 
+// show/hide overlay elements on mouseover/mouseout
 function addOverlayFunctions(overlay, buttons, frame) {
     const { chatInput } = TW_CLASSES
 
@@ -405,6 +413,7 @@ function addOverlayFunctions(overlay, buttons, frame) {
     }
 }
 
+// when user makes changes to theme change styles and save to local storage
 function updateThemeStyles() {
     let chat, focusdoc, scrollBar
 
@@ -451,6 +460,7 @@ function updateThemeStyles() {
     chrome.storage.local.set({ overlaySettings: settings })
 }
 
+// when user makes changes to theme change styles and save to local storage
 function updateChatStyles() {
     let chat
 
@@ -484,6 +494,7 @@ function updateChatStyles() {
     chrome.storage.local.set({ overlaySettings: settings })
 }
 
+// on fullscreen change we need to translate the position of the overlay to a new position based on new video element resolution to maintian ratios
 function translateOverlayPosition() {
     const { top, left, width, height } = overlayPosition
     let overlayEl = document.querySelector(`.${TC_CLASSES.overlay}`)
@@ -497,6 +508,7 @@ function translateOverlayPosition() {
     }
 }
 
+// only build overlay on twitch.tv/* pages that have a video player and a chat (these are live/vods)
 function waitForVideo() {
     const { playerControls, chatShell, liveChat, vodChat } = TW_CLASSES
     const timeNow = Date.now()
@@ -531,6 +543,7 @@ function waitForVideo() {
     }, 500)
 }
 
+// when we lose the player controls or location changes we need to wait for video player / chat again
 function detectNeedGC() {
     let location = window.location.pathname
 
@@ -551,6 +564,7 @@ function detectNeedGC() {
     }, 500)
 }
 
+// get settings from storage then look for a video / chat to build overlay
 chrome.storage.local.get(['overlaySettings'], function (result) {
     if (result && Object.keys(result).length === 0) {
         settings = DEFAULT_SETTINGS
@@ -559,15 +573,15 @@ chrome.storage.local.get(['overlaySettings'], function (result) {
     }
     buildSettingsObjects()
     waitForVideo()
-})
 
-document.onkeydown = function (e) {
-    if (
-        e.key.toLowerCase() === 'o' &&
-        e.target.tagName.toLowerCase() === 'body'
-    ) {
-        toggleShowOverlay()
+    document.onkeydown = function (e) {
+        if (
+            e.key.toLowerCase() === 'o' &&
+            e.target.tagName.toLowerCase() === 'body'
+        ) {
+            toggleShowOverlay()
+        }
     }
-}
 
-document.onfullscreenchange = translateOverlayPosition
+    document.onfullscreenchange = translateOverlayPosition
+})
