@@ -86,6 +86,7 @@ let settingsElements = null
 const DEFAULT_SETTINGS = {
     theme: {
         darkMode: true,
+        alpha: 50,
         darkBackground: {
             red: 31,
             green: 31,
@@ -96,12 +97,12 @@ const DEFAULT_SETTINGS = {
             green: 255,
             blue: 255,
         },
-        alpha: 50,
     },
     chat: {
         fontSize: 14,
         bold: false,
         opacity: 100,
+        outline: false,
     },
 }
 
@@ -166,6 +167,17 @@ const buildSettingsObjects = () => {
                 onchange: function () {
                     settings.theme.darkMode = this.checked
                     updateThemeStyles()
+                },
+            },
+            chatOutline: {
+                name: 'chatOutline',
+                type: 'toggles',
+                label: 'Chat Outline',
+                checked: settings.chat.outline,
+                id: 'over-chat-settings-outline',
+                onchange: function () {
+                    settings.chat.outline = this.checked
+                    updateChatStyles()
                 },
             },
         },

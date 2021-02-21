@@ -462,10 +462,14 @@ function updateChatStyles() {
         chat = document.querySelector(`.${TC_CLASSES.overlayVodChat} ul`)
     }
 
-    const { opacity, bold, fontSize } = settings.chat
+    const darkMode = settings.theme.darkMode
+    const { opacity, bold, fontSize, outline } = settings.chat
     chat.setAttribute('style', `font-size: ${fontSize}px !important;`)
     chat.style.fontWeight = bold ? 'bold' : 'normal'
     chat.style.opacity = opacity / 100
+    chat.style.textShadow = outline
+        ? `1px 1px 1px ${darkMode ? 'black' : 'white'}`
+        : 'none'
 
     chrome.storage.local.set({ overlaySettings: settings })
 }
