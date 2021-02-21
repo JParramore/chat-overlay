@@ -244,8 +244,8 @@ const observeVodMessage = (twMessageWrapper) => {
     vodObserver.observe(twMessageWrapper, config)
 }
 
-const insertPlayClipButton = (node, linkEl) => {
-    let slug = linkEl.pathname.substr(1)
+const insertPlayClipButton = (node, slug) => {
+    //let slug = linkEl.pathname.substr(1)
 
     let wrapper = document.createElement('div')
     wrapper.style.paddingLeft = '1rem'
@@ -256,16 +256,20 @@ const insertPlayClipButton = (node, linkEl) => {
     stylesheet.rel = 'stylesheet'
     stylesheet.href =
         'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'
-    
+
     let label = document.createElement('span')
     label.style.fontSize = '24px'
     let icon = document.createElement('i')
-    TC_CLASSES.playIcon.forEach(className => icon.classList.add(className))
+    TC_CLASSES.playIcon.forEach((className) => icon.classList.add(className))
     label.appendChild(icon)
-    TW_CLASSES.buttons.coreLabel.forEach(className => label.classList.add(className))
+    TW_CLASSES.buttons.coreLabel.forEach((className) =>
+        label.classList.add(className)
+    )
 
     let button = document.createElement('button')
-    TW_CLASSES.buttons.overlayButton.forEach(className => button.classList.add(className))
+    TW_CLASSES.buttons.overlayButton.forEach((className) =>
+        button.classList.add(className)
+    )
     button.onclick = () => insertClipPlayer(slug)
 
     wrapper.appendChild(stylesheet)
@@ -276,39 +280,43 @@ const insertPlayClipButton = (node, linkEl) => {
 }
 
 const insertClipPlayer = (slug) => {
-    let parentVideo = document.querySelector(`.${TW_CLASSES.videoPlayerOverlay}`)
+    let parentVideo = document.querySelector(
+        `.${TW_CLASSES.videoPlayerOverlay}`
+    )
 
     let uid = 'uid' + Date.now()
     let wrapper = document.createElement('div')
     wrapper.className = TC_CLASSES.overlayClip
     wrapper.classList.add(TC_CLASSES.core)
-    wrapper.id = (uid)
+    wrapper.id = uid
 
     let frame = document.createElement('iframe')
     frame.src = `https://clips.twitch.tv/embed?clip=${slug}&parent=twitch.tv&autoplay=true`
     frame.width = '100%'
-    frame.height = '100%' 
+    frame.height = '100%'
     frame.onload = function () {
-        let clipOverlay = this.contentWindow.document.body.querySelector(`.${TW_CLASSES.videoPlayerOverlay}`);
-        clipOverlay.style.opacity = '0.5';
-        clipOverlay.querySelector('.top-bar').remove();
+        let clipOverlay = this.contentWindow.document.body.querySelector(
+            `.${TW_CLASSES.videoPlayerOverlay}`
+        )
+        clipOverlay.style.opacity = '0.5'
+        clipOverlay.querySelector('.top-bar').remove()
 
-        clip = this.contentWindow.document.body.getElementsByTagName('video')[0];
+        clip = this.contentWindow.document.body.getElementsByTagName('video')[0]
         clip.onended = function () {
-            wrapper.remove();
+            wrapper.remove()
         }
     }
 
     let buttonsContainer = document.createElement('div')
 
     let dragBtn = buildDragButton(`#${uid}`)
-    let closeBtn = buildCloseButton(function() {
+    let closeBtn = buildCloseButton(function () {
         wrapper.remove()
     })
 
     buttonsContainer.appendChild(closeBtn)
     buttonsContainer.appendChild(dragBtn)
-    
+
     buttonsContainer.style.position = 'absolute'
     buttonsContainer.style.top = '1rem'
     buttonsContainer.style.left = '1rem'
@@ -337,8 +345,15 @@ const observeChatClips = (chat) => {
                 let className = node.className
                 let linkFragment = node.querySelector(`.link-fragment`)
                 if (className && linkFragment) {
-                    if ((linkFragment.hostname === 'clips.twitch.tv')) {
-                        insertPlayClipButton(node, linkFragment)
+                    if (linkFragment.hostname === 'clips.twitch.tv') {
+                        let slug = linkEl.pathname.substr(1)
+                        insertPlayClipButton(node, slug)
+                    } else if (linkFragment.hostname === 'www.twitch.tv') {
+                        let re = /^[/]\w+(\/clip\/)[a-zA-Z]+$/
+                        if (re.test(linkFragment.pathname)) {
+                            let slug = linkFragment.pathname.split('/')[3]
+                            insertPlayClipButton(node, slug)
+                        }
                     }
                 }
             })
@@ -359,8 +374,7 @@ const setDraggable = (draggable, container, frame) => {
         pos4 = 0
     draggable.onmousedown = dragMouseDown
 
-    container.onmouseup = () =>
-        setOverlayPosition()
+    container.onmouseup = () => setOverlayPosition()
 
     function dragMouseDown(e) {
         videoPlayerHeight = fsElement.offsetHeight
