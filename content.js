@@ -16,14 +16,14 @@ function init() {
 
     coreComponents.push(overlayButtonEl)
     coreComponents.push(overlayEl)
-    coreComponents.forEach((element) => element.classList.add(core))
+    coreComponents.forEach(element => element.classList.add(core))
 }
 
 // sanity check - remove core components on rebuild
 function garbageCollect() {
     document
         .querySelectorAll(`.${TC_CLASSES.core}`)
-        .forEach((element) => element.remove())
+        .forEach(element => element.remove())
 }
 
 // build overlay chat container and components
@@ -55,28 +55,29 @@ function buildOverlay() {
         frame.width = '100%'
         frame.onload = function () {
             let frameDoc = this.contentWindow.document
-            toHide.forEach((className) => {
-                elementReady(`.${className}`, frameDoc).then((el) =>
-                    display.forEach((displayClass) =>
+            toHide.forEach(className => {
+                elementReady(`.${className}`, frameDoc).then(el =>
+                    display.forEach(displayClass =>
                         el.classList.remove(displayClass)
                     )
                 )
             })
-            elementReady(`.${settingsContainer}`, document).then((el) => {
+            elementReady(`.${settingsContainer}`, document).then(el => {
                 updateThemeStyles()
                 updateChatStyles()
+                translateOverlayPosition()
                 frameDoc.body
                     .querySelector('.chat-input')
                     .classList.add('chat-input__hide')
                 addOverlayFunctions(container, el, frameDoc.body)
             })
-            elementReady(`.${chatScrollableArea}`, frameDoc).then((chatEl) => {
+            elementReady(`.${chatScrollableArea}`, frameDoc).then(chatEl => {
                 observeLiveChat(chatEl)
             })
         }
         container.prepend(frame)
     } else {
-        elementReady(`.${vodChatListWrapper} ul`, document).then((el) => {
+        elementReady(`.${vodChatListWrapper} ul`, document).then(el => {
             let wrapper = document.querySelector(`.${vodChatListWrapper}`)
             let clone = wrapper.cloneNode(true)
             clone.classList.add(overlayVodChat)
@@ -101,9 +102,10 @@ function buildOverlay() {
     container.appendChild(relativeWrapper)
 
     if (!isLive)
-        elementReady(`.${overlayVodChat}`, document).then((el) => {
+        elementReady(`.${overlayVodChat}`, document).then(el => {
             updateThemeStyles()
             updateChatStyles()
+            translateOverlayPosition()
             addOverlayFunctions(container, settingsContainerEl, null)
         })
 
@@ -133,13 +135,13 @@ function buildOverlaySettings() {
     const sliders = Object.keys(settingsElements.sliders)
     const toggles = Object.keys(settingsElements.toggles)
 
-    sliders.forEach((el) => {
+    sliders.forEach(el => {
         const { label, min, max, value, input } = settingsElements.sliders[el]
         const slider = buildSliderSetting(label, min, max, value, input)
         wrapper.appendChild(slider)
     })
 
-    toggles.forEach((el) => {
+    toggles.forEach(el => {
         const { label, checked, id, onchange } = settingsElements.toggles[el]
         const toggle = buildToggleSetting(label, checked, id, onchange)
         wrapper.appendChild(toggle)
@@ -223,7 +225,7 @@ function buildOverlayButtons() {
     buttons.push(overlaySettingsEl)
     buttons.push(dragButtonEl)
 
-    buttons.forEach((button) => overlayButtons.appendChild(button))
+    buttons.forEach(button => overlayButtons.appendChild(button))
 
     return overlayButtons
 }
@@ -248,18 +250,18 @@ function buildDragButton(toDragSelector) {
 
     let button = document.createElement('button')
     button.className = dragButton
-    coreButton.forEach((className) => button.classList.add(className))
+    coreButton.forEach(className => button.classList.add(className))
     button.style.cursor = 'move'
 
     let icon = document.createElement('i')
-    dragIcon.forEach((className) => icon.classList.add(className))
-    coreLabel.forEach((className) => icon.classList.add(className))
+    dragIcon.forEach(className => icon.classList.add(className))
+    coreLabel.forEach(className => icon.classList.add(className))
 
     button.appendChild(icon)
     container.appendChild(stylesheet)
     container.appendChild(button)
 
-    elementReady(toDragSelector, document).then((el) => {
+    elementReady(toDragSelector, document).then(el => {
         let frame = document.querySelector(`.${overlayFrame}`)
         setDraggable(container, el, frame)
     })
@@ -287,7 +289,7 @@ function buildOverlaySettingsButton() {
 
     let button = document.createElement('button')
     button.className = settingsButton
-    coreButton.forEach((className) => button.classList.add(className))
+    coreButton.forEach(className => button.classList.add(className))
     button.onclick = () => {
         document.querySelector(`.${settingsWrapper}`).parentElement.className =
             'tc-wrapper-1rem'
@@ -295,8 +297,8 @@ function buildOverlaySettingsButton() {
     }
 
     let icon = document.createElement('i')
-    settingsIcon.forEach((className) => icon.classList.add(className))
-    coreLabel.forEach((className) => icon.classList.add(className))
+    settingsIcon.forEach(className => icon.classList.add(className))
+    coreLabel.forEach(className => icon.classList.add(className))
 
     button.appendChild(icon)
     container.appendChild(stylesheet)
@@ -319,12 +321,12 @@ function buildCloseButton(closeFunction) {
 
     let button = document.createElement('button')
     button.className = closeButton
-    coreButton.forEach((className) => button.classList.add(className))
+    coreButton.forEach(className => button.classList.add(className))
     button.onclick = closeFunction
 
     let icon = document.createElement('i')
-    closeIcon.forEach((className) => icon.classList.add(className))
-    coreLabel.forEach((className) => icon.classList.add(className))
+    closeIcon.forEach(className => icon.classList.add(className))
+    coreLabel.forEach(className => icon.classList.add(className))
 
     button.appendChild(icon)
     container.appendChild(stylesheet)
@@ -476,7 +478,7 @@ function updateChatStyles() {
     let badges = chat.querySelectorAll(
         '.chat-badge, a[data-a-target="chat-badge"]'
     )
-    badges.forEach((badge) =>
+    badges.forEach(badge =>
         removeBadges
             ? badge.classList.add(TC_CLASSES.chatBadgeHide)
             : badge.classList.remove(TC_CLASSES.chatBadgeHide)
@@ -494,9 +496,42 @@ function updateChatStyles() {
     chrome.storage.local.set({ overlaySettings: settings })
 }
 
+// calculate position as % based on pos over video player size to translate position and dimensions on different sized players
+const updateOverlayPosition = () => {
+    let overlay = document.querySelector(`.${TC_CLASSES.overlay}`)
+    let parent = overlay.parentElement
+
+    const current = {
+        top: overlay.offsetTop / parent.offsetHeight,
+        left: overlay.offsetLeft / parent.offsetWidth,
+        width: overlay.offsetWidth / parent.offsetWidth,
+        height: overlay.offsetHeight / parent.offsetHeight,
+    }
+
+    // sanity check positions 0 <= pos <= 1
+    const satisfies = positions => {
+        for (const position of positions) {
+            if (position < 0 || position > 1) {
+                return false
+            }
+        }
+        return true
+    }
+
+    satisfies(Object.values(current))
+        ? (settings.position = current)
+        : (settings.position = DEFAULT_SETTINGS.position)
+
+    // sanity check border overflowing video player
+    if (current.width + current.left > 1) current.left = 1.0 - current.width
+    if (current.height + current.top > 1) current.top = 1.0 - current.height
+
+    chrome.storage.local.set({ overlaySettings: settings })
+}
+
 // on fullscreen change we need to translate the position of the overlay to a new position based on new video element resolution to maintian ratios
 function translateOverlayPosition() {
-    const { top, left, width, height } = overlayPosition
+    const { top, left, width, height } = settings.position
     let overlayEl = document.querySelector(`.${TC_CLASSES.overlay}`)
     let buttonEl = document.querySelector(`.${TC_CLASSES.overlayButton}`)
 

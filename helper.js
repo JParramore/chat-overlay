@@ -85,6 +85,12 @@ let settings = null
 let settingsElements = null
 
 const DEFAULT_SETTINGS = {
+    position: {
+        top: 0,
+        left: 0,
+        width: 0.5,
+        height: 0.3,
+    },
     theme: {
         darkMode: true,
         alpha: 50,
@@ -206,7 +212,7 @@ const elementReady = (selector, doc) => {
         }
         new MutationObserver((mutationRecords, observer) => {
             // Query for elements matching the specified selector
-            Array.from(doc.querySelectorAll(selector)).forEach((element) => {
+            Array.from(doc.querySelectorAll(selector)).forEach(element => {
                 resolve(element)
                 //Once we have resolved we don't need the observer anymore.
                 observer.disconnect()
@@ -237,11 +243,11 @@ const elementRemoved = (selector, doc) => {
 }
 
 let clipObserver = null
-const observeLiveChat = (chat) => {
+const observeLiveChat = chat => {
     if (clipObserver) clipObserver.disconnect()
     clipObserver = new MutationObserver(function (mutationsList, clipObserver) {
         for (const mutation of mutationsList) {
-            mutation.addedNodes.forEach((node) => {
+            mutation.addedNodes.forEach(node => {
                 let className = node.className
                 let linkFragments = node.querySelectorAll(`.link-fragment`)
                 let badges =
@@ -252,7 +258,7 @@ const observeLiveChat = (chat) => {
                 if (linkFragments.length > 0)
                     linkClips(node, className, linkFragments)
                 if (settings.chat.removeBadges)
-                    badges.forEach((badge) =>
+                    badges.forEach(badge =>
                         badge.classList.add(`${TC_CLASSES.chatBadgeHide}`)
                     )
             })
@@ -282,12 +288,12 @@ const observeLiveChat = (chat) => {
 }
 
 let vodObserver = null
-const observeVodChat = (twMessageWrapper) => {
+const observeVodChat = twMessageWrapper => {
     let pathname = window.location.pathname
     if (vodObserver) vodObserver.disconnect()
     vodObserver = new MutationObserver(function (mutationsList, vodObserver) {
         for (const mutation of mutationsList) {
-            mutation.addedNodes.forEach((node) => {
+            mutation.addedNodes.forEach(node => {
                 if (window.location.pathname !== pathname)
                     vodObserver.disconnect()
                 if (node.matches(`li[class="tw-full-width`)) addNewMessage(node)
@@ -309,14 +315,14 @@ const observeVodChat = (twMessageWrapper) => {
                 '.chat-badge, a[data-a-target="chat-badge"]'
             ) || []
         if (settings.chat.removeBadges)
-            badges.forEach((badge) =>
+            badges.forEach(badge =>
                 badge.classList.add(`${TC_CLASSES.chatBadgeHide}`)
             )
         listContainer.appendChild(clone)
 
         let count = listContainer.childNodes.length
         while (count-- > 100) listContainer.firstChild.remove()
-        
+
         let tcChat = document.querySelector(`.${TW_CLASSES.overlayVodChat}`)
         if (tcChat && tcChat.scrollHeight)
             tcChat.scrollTop = tcChat.scrollHeight
@@ -337,14 +343,14 @@ const insertPlayClipButton = (node, slug) => {
     let label = document.createElement('span')
     label.style.fontSize = '24px'
     let icon = document.createElement('i')
-    TC_CLASSES.playIcon.forEach((className) => icon.classList.add(className))
+    TC_CLASSES.playIcon.forEach(className => icon.classList.add(className))
     label.appendChild(icon)
-    TW_CLASSES.buttons.coreLabel.forEach((className) =>
+    TW_CLASSES.buttons.coreLabel.forEach(className =>
         label.classList.add(className)
     )
 
     let button = document.createElement('button')
-    TW_CLASSES.buttons.overlayButton.forEach((className) =>
+    TW_CLASSES.buttons.overlayButton.forEach(className =>
         button.classList.add(className)
     )
     button.onclick = () => insertClipPlayer(slug)
@@ -356,7 +362,7 @@ const insertPlayClipButton = (node, slug) => {
     node.appendChild(wrapper)
 }
 
-const insertClipPlayer = (slug) => {
+const insertClipPlayer = slug => {
     let parentVideo = document.querySelector(
         `.${TW_CLASSES.videoPlayerOverlay}`
     )
@@ -424,7 +430,7 @@ const setDraggable = (draggable, container, frame) => {
         pos4 = 0
     draggable.onmousedown = dragMouseDown
 
-    container.onmouseup = () => setOverlayPosition()
+    container.onmouseup = () => updateOverlayPosition()
 
     function dragMouseDown(e) {
         videoPlayerHeight = fsElement.offsetHeight
@@ -483,30 +489,13 @@ const setDraggable = (draggable, container, frame) => {
         // stop moving when mouse button is released:
         document.onmouseup = null
         document.onmousemove = null
-        setOverlayPosition()
+        updateOverlayPosition()
 
         let frameBody = frame ? frame.contentWindow.document.body : null
         if (frameBody) {
             frameBody.onmouseup = null
         }
     }
-}
-
-let overlayPosition = {
-    top: 0.0,
-    left: 0.0,
-    width: 0.5,
-    height: 0.5,
-}
-
-const setOverlayPosition = () => {
-    let overlay = document.querySelector(`.${TC_CLASSES.overlay}`)
-    let parent = overlay.parentElement
-
-    overlayPosition.top = overlay.offsetTop / parent.offsetHeight
-    overlayPosition.left = overlay.offsetLeft / parent.offsetWidth
-    overlayPosition.width = overlay.offsetWidth / parent.offsetWidth
-    overlayPosition.height = overlay.offsetHeight / parent.offsetHeight
 }
 
 const animateShowComponent = (ElSelector, offsetElSelector) => {
