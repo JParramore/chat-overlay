@@ -343,16 +343,20 @@ const observeChatClips = (chat) => {
         for (const mutation of mutationsList) {
             mutation.addedNodes.forEach((node) => {
                 let className = node.className
-                let linkFragment = node.querySelector(`.link-fragment`)
-                if (className && linkFragment) {
-                    if (linkFragment.hostname === 'clips.twitch.tv') {
-                        let slug = linkEl.pathname.substr(1)
-                        insertPlayClipButton(node, slug)
-                    } else if (linkFragment.hostname === 'www.twitch.tv') {
-                        let re = /^[/]\w+(\/clip\/)[a-zA-Z]+$/
-                        if (re.test(linkFragment.pathname)) {
-                            let slug = linkFragment.pathname.split('/')[3]
+                let linkFragments = node.querySelectorAll(`.link-fragment`)
+                for (const linkFragment of linkFragments) {
+                    if (className && linkFragment) {
+                        if (linkFragment.hostname === 'clips.twitch.tv') {
+                            let slug = linkEl.pathname.substr(1)
                             insertPlayClipButton(node, slug)
+                            break
+                        } else if (linkFragment.hostname === 'www.twitch.tv') {
+                            let re = /^[/]\w+(\/clip\/)[a-zA-Z]+$/
+                            if (re.test(linkFragment.pathname)) {
+                                let slug = linkFragment.pathname.split('/')[3]
+                                insertPlayClipButton(node, slug)
+                                break
+                            }
                         }
                     }
                 }
