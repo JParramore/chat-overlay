@@ -439,7 +439,7 @@ const setDraggable = (draggable, container, frame) => {
         // call a function whenever the cursor moves:
         document.onmousemove = elementDrag
 
-        let frameBody = frame.contentWindow.document.body
+        let frameBody = frame ? frame.contentWindow.document.body : null
         if (frameBody) {
             frameBody.onmouseup = closeDragElement
         }
@@ -485,7 +485,7 @@ const setDraggable = (draggable, container, frame) => {
         document.onmousemove = null
         setOverlayPosition()
 
-        let frameBody = frame.contentWindow.document.body
+        let frameBody = frame ? frame.contentWindow.document.body : null
         if (frameBody) {
             frameBody.onmouseup = null
         }
