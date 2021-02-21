@@ -16,6 +16,7 @@ Movable, resizable, transparent chat box overlay:
 - Change background and text opacity
 - Change chat message font size and styling
 - Light/Dark themes
+- Toggle chat badges on/off
 - Move and resize
 - Settings are saved
 
