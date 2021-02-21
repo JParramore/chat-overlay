@@ -1,6 +1,6 @@
 # Fullscreen Chat Overlay for Twitch
 
-A chrome extension for twitch that allows users to view and customise chat as an overlay while watching livestreams or VODs.
+A chrome extension for [twitch](https://www.twitch.tv/) that allows users to view and customise chat as an overlay while watching livestreams or VODs.
 
 ## Demo
 
