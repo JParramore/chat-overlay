@@ -219,8 +219,8 @@ function buildOverlayButtons() {
     overlayButtons.style.display = 'flex'
     let buttons = []
 
-    let overlaySettingsEl = buildOverlaySettingsButton()
-    let dragButtonEl = buildDragButton(`.${overlay}`)
+    let overlaySettingsEl = buildOverlaySettingsButton(TW_CLASSES.buttons.coreButton)
+    let dragButtonEl = buildDragButton(TW_CLASSES.buttons.coreButton, `.${overlay}`)
 
     buttons.push(overlaySettingsEl)
     buttons.push(dragButtonEl)
@@ -230,7 +230,7 @@ function buildOverlayButtons() {
     return overlayButtons
 }
 
-function buildDragButton(toDragSelector) {
+function buildDragButton(buttonClasses, toDragSelector) {
     const { coreButton, coreLabel } = TW_CLASSES.buttons
     const {
         dragButton,
@@ -250,7 +250,7 @@ function buildDragButton(toDragSelector) {
 
     let button = document.createElement('button')
     button.className = dragButton
-    coreButton.forEach(className => button.classList.add(className))
+    buttonClasses.forEach(className => button.classList.add(className))
     button.style.cursor = 'move'
 
     let icon = document.createElement('i')
@@ -269,7 +269,7 @@ function buildDragButton(toDragSelector) {
     return container
 }
 
-function buildOverlaySettingsButton() {
+function buildOverlaySettingsButton(buttonClasses) {
     const { coreButton, coreLabel } = TW_CLASSES.buttons
     const {
         settingsButton,
@@ -289,7 +289,7 @@ function buildOverlaySettingsButton() {
 
     let button = document.createElement('button')
     button.className = settingsButton
-    coreButton.forEach(className => button.classList.add(className))
+    buttonClasses.forEach(className => button.classList.add(className))
     button.onclick = () => {
         document.querySelector(`.${settingsWrapper}`).parentElement.className =
             'tc-wrapper-1rem'
@@ -307,7 +307,7 @@ function buildOverlaySettingsButton() {
     return container
 }
 
-function buildCloseButton(closeFunction) {
+function buildCloseButton(buttonClasses, closeFunction) {
     const { coreButton, coreLabel } = TW_CLASSES.buttons
     const { closeButton, closeIcon, buttonWrapper } = TC_CLASSES
 
@@ -321,7 +321,7 @@ function buildCloseButton(closeFunction) {
 
     let button = document.createElement('button')
     button.className = closeButton
-    coreButton.forEach(className => button.classList.add(className))
+    buttonClasses.forEach(className => button.classList.add(className))
     button.onclick = closeFunction
 
     let icon = document.createElement('i')

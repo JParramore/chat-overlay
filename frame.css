@@ -39,3 +39,19 @@ button[data-a-target="chat-settings"] {
 .tc-chat-badge-hide {
     display: none;
 }
+
+.svg-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.svg-icon path,
+.svg-icon polygon,
+.svg-icon rect {
+    fill: #ffffff;
+}
+
+.svg-icon circle {
+    stroke: #ffffff;
+    stroke-width: 1;
+}

@@ -15,14 +15,11 @@
 .tc-overlay-clip {
     top: 30%;
     left: 30%;
-    height: 40%;
-    width: 40%;
+    width: 40vw;
+    height: calc(40vw * 9 / 16);
     position: absolute;
     z-index: 2147483647;
-    border: 2px solid transparent;
     border-radius: 5px;
-    resize: both;
-    overflow: hidden;
 }
 
 .tc-overlay-vod-chat {

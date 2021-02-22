@@ -65,6 +65,12 @@ const TW_CLASSES = {
             'tw-core-button--overlay',
             'tw-justify-content-center',
         ],
+        clearButton: [
+            'ScCoreButton-sc-1qn4ixc-0',
+            'gqSiKD',
+            'tw-button-icon',
+            'tw-core-button',
+        ],
     },
     toHide: [
         'channel-leaderboard',
@@ -331,35 +337,19 @@ const observeVodChat = twMessageWrapper => {
 
 const insertPlayClipButton = (node, slug) => {
     let wrapper = document.createElement('div')
-    wrapper.style.paddingLeft = '1rem'
-    wrapper.style.display = 'flex'
-    wrapper.style.alignItems = 'center'
-
-    let stylesheet = document.createElement('link')
-    stylesheet.rel = 'stylesheet'
-    stylesheet.href =
-        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css'
-
-    let label = document.createElement('span')
-    label.style.fontSize = '24px'
-    let icon = document.createElement('i')
-    TC_CLASSES.playIcon.forEach(className => icon.classList.add(className))
-    label.appendChild(icon)
-    TW_CLASSES.buttons.coreLabel.forEach(className =>
-        label.classList.add(className)
-    )
+    wrapper.style.paddingRight = '0.5rem'
 
     let button = document.createElement('button')
-    TW_CLASSES.buttons.overlayButton.forEach(className =>
+    TW_CLASSES.buttons.clearButton.forEach(className =>
         button.classList.add(className)
     )
+    button.style.height = '100%'
     button.onclick = () => insertClipPlayer(slug)
+    button.innerHTML = OVERLAY_BTN_SVG
 
-    wrapper.appendChild(stylesheet)
     wrapper.appendChild(button)
-    button.appendChild(label)
     node.style.display = 'flex'
-    node.appendChild(wrapper)
+    node.prepend(wrapper)
 }
 
 const insertClipPlayer = slug => {
@@ -392,8 +382,8 @@ const insertClipPlayer = slug => {
 
     let buttonsContainer = document.createElement('div')
 
-    let dragBtn = buildDragButton(`#${uid}`)
-    let closeBtn = buildCloseButton(function () {
+    let dragBtn = buildDragButton(TW_CLASSES.buttons.clearButton, `#${uid}`)
+    let closeBtn = buildCloseButton(TW_CLASSES.buttons.clearButton, function () {
         wrapper.remove()
     })
 
@@ -406,11 +396,9 @@ const insertClipPlayer = slug => {
     buttonsContainer.style.display = 'none'
 
     wrapper.onmouseover = () => {
-        wrapper.style.border = '2px solid rgb(145,71,255)'
         buttonsContainer.style.display = 'flex'
     }
     wrapper.onmouseout = () => {
-        wrapper.style.border = '2px solid transparent'
         buttonsContainer.style.display = 'none'
     }
 
