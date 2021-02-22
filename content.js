@@ -459,7 +459,7 @@ function updateThemeStyles() {
 
     if (scrollBar) scrollBar.style.opacity = alpha / 100
 
-    chrome.storage.local.set({ overlaySettings: settings })
+    updateChatStyles()
 }
 
 // when user makes changes to theme change styles and save to local storage
