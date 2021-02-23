@@ -8,14 +8,18 @@ function init() {
 
     let video = document.querySelector(`.${videoPlayerOverlay}`)
     let overlayEl = buildOverlay()
-    video.appendChild(overlayEl)
 
     let videoControls = document.querySelector(`.${playerControls}`)
     let overlayButtonEl = buildToggleOverlayButton()
+    let settingsEl = buildOverlaySettings()
+
+    video.appendChild(overlayEl)
+    video.appendChild(settingsEl)
     videoControls.prepend(overlayButtonEl)
 
     coreComponents.push(overlayButtonEl)
     coreComponents.push(overlayEl)
+    coreComponents.push(settingsEl)
     coreComponents.forEach(element => element.classList.add(core))
 }
 
@@ -32,7 +36,7 @@ function buildOverlay() {
         overlay,
         overlayFrame,
         overlayVodChat,
-        settingsContainer,
+        overlayButtonsContainer,
     } = TC_CLASSES
     const {
         toHide,
@@ -62,7 +66,7 @@ function buildOverlay() {
                     )
                 )
             })
-            elementReady(`.${settingsContainer}`, document).then(el => {
+            elementReady(`.${overlayButtonsContainer}`, document).then(el => {
                 updateThemeStyles()
                 updateChatStyles()
                 translateOverlayPosition()
@@ -86,27 +90,15 @@ function buildOverlay() {
         })
     }
 
-    let relativeWrapper = document.createElement('div')
-    relativeWrapper.style.width = '100%'
-    relativeWrapper.style.position = 'relative'
-
-    let settingsContainerEl = document.createElement('div')
-    settingsContainerEl.className = settingsContainer
-
     let buttons = buildOverlayButtons()
-    let settingsEl = buildOverlaySettings()
-
-    settingsContainerEl.appendChild(buttons)
-    settingsContainerEl.appendChild(settingsEl)
-    relativeWrapper.appendChild(settingsContainerEl)
-    container.appendChild(relativeWrapper)
+    container.appendChild(buttons)
 
     if (!isLive)
         elementReady(`.${overlayVodChat}`, document).then(el => {
             updateThemeStyles()
             updateChatStyles()
             translateOverlayPosition()
-            addOverlayFunctions(container, settingsContainerEl, null)
+            addOverlayFunctions(container, buttons, null)
         })
 
     return container
@@ -114,10 +106,16 @@ function buildOverlay() {
 
 // using settingsElements obj build settings
 function buildOverlaySettings() {
-    const { settingsWrapper, settingsHeader } = TC_CLASSES
+    const {
+        settingsWrapper,
+        settingsHeader,
+        settingsContainer,
+        settingsButtonsContainer,
+    } = TC_CLASSES
 
     let container = document.createElement('div')
-    container.style.paddingTop = '1rem'
+    container.className = settingsContainer
+    container.style.display = 'none'
 
     let wrapper = document.createElement('div')
     wrapper.className = settingsWrapper
@@ -125,13 +123,30 @@ function buildOverlaySettings() {
     let header = document.createElement('div')
     header.className = settingsHeader
 
+    let buttons = document.createElement('div')
+    buttons.className = settingsButtonsContainer
+    buttons.appendChild(
+        buildCloseButton(TW_CLASSES.buttons.clearButton, function () {
+            let settings = document.querySelector(`.${settingsContainer}`)
+            if (settings) {
+                const hidden =
+                    !settings.style.display || settings.style.display === 'none'
+                if (hidden) {
+                    settings.style.display = 'flex'
+                } else {
+                    settings.style.display = 'none'
+                }
+            }
+        })
+    )
+
     let title = document.createElement('span')
     title.innerHTML = 'Overlay Settings'
 
+    header.appendChild(buttons)
     header.appendChild(title)
     wrapper.appendChild(header)
 
-    container.appendChild(wrapper)
     const sliders = Object.keys(settingsElements.sliders)
     const toggles = Object.keys(settingsElements.toggles)
 
@@ -146,6 +161,8 @@ function buildOverlaySettings() {
         const toggle = buildToggleSetting(label, checked, id, onchange)
         wrapper.appendChild(toggle)
     })
+
+    container.appendChild(wrapper)
 
     return container
 }
@@ -213,14 +230,15 @@ function buildSliderSetting(text, min, max, value, input) {
 // build the settings and drag buttons for the overlay
 function buildOverlayButtons() {
     const { overlayButtonsContainer, overlay, overlayFrame } = TC_CLASSES
+    const { coreButton } = TW_CLASSES.buttons
 
     let overlayButtons = document.createElement('div')
     overlayButtons.className = overlayButtonsContainer
     overlayButtons.style.display = 'flex'
     let buttons = []
 
-    let overlaySettingsEl = buildOverlaySettingsButton(TW_CLASSES.buttons.coreButton)
-    let dragButtonEl = buildDragButton(TW_CLASSES.buttons.coreButton, `.${overlay}`)
+    let overlaySettingsEl = buildOverlaySettingsButton(coreButton)
+    let dragButtonEl = buildDragButton(coreButton, `.${overlay}`)
 
     buttons.push(overlaySettingsEl)
     buttons.push(dragButtonEl)
@@ -231,14 +249,8 @@ function buildOverlayButtons() {
 }
 
 function buildDragButton(buttonClasses, toDragSelector) {
-    const { coreButton, coreLabel } = TW_CLASSES.buttons
-    const {
-        dragButton,
-        dragIcon,
-        buttonWrapper,
-        overlay,
-        overlayFrame,
-    } = TC_CLASSES
+    const { coreLabel } = TW_CLASSES.buttons
+    const { dragButton, dragIcon, buttonWrapper, overlayFrame } = TC_CLASSES
 
     let container = document.createElement('div')
     container.className = buttonWrapper
@@ -270,13 +282,12 @@ function buildDragButton(buttonClasses, toDragSelector) {
 }
 
 function buildOverlaySettingsButton(buttonClasses) {
-    const { coreButton, coreLabel } = TW_CLASSES.buttons
+    const { coreLabel } = TW_CLASSES.buttons
     const {
         settingsButton,
         settingsIcon,
         buttonWrapper,
         settingsContainer,
-        settingsWrapper,
     } = TC_CLASSES
 
     let container = document.createElement('div')
@@ -291,9 +302,12 @@ function buildOverlaySettingsButton(buttonClasses) {
     button.className = settingsButton
     buttonClasses.forEach(className => button.classList.add(className))
     button.onclick = () => {
-        document.querySelector(`.${settingsWrapper}`).parentElement.className =
-            'tc-wrapper-1rem'
-        animateShowComponent(`.${settingsContainer}`, `.tc-wrapper-1rem`)
+        let settings = document.querySelector(`.${settingsContainer}`)
+        if (settings.style.display === 'none') {
+            settings.style.display = 'flex'
+        } else {
+            settings.style.display = 'none'
+        }
     }
 
     let icon = document.createElement('i')
@@ -308,7 +322,7 @@ function buildOverlaySettingsButton(buttonClasses) {
 }
 
 function buildCloseButton(buttonClasses, closeFunction) {
-    const { coreButton, coreLabel } = TW_CLASSES.buttons
+    const { coreLabel } = TW_CLASSES.buttons
     const { closeButton, closeIcon, buttonWrapper } = TC_CLASSES
 
     let container = document.createElement('div')
@@ -363,6 +377,7 @@ function buildToggleOverlayButton() {
 // show or hide the overlay
 function toggleShowOverlay() {
     let overlayEl = document.querySelector(`.${TC_CLASSES.overlay}`)
+    let settings = document.querySelector(`.${TC_CLASSES.settingsContainer}`)
     let overlayBtnEl = document.querySelector(`.${TC_CLASSES.overlayButton}`)
     if (overlayEl && overlayBtnEl) {
         const hidden =
@@ -372,6 +387,7 @@ function toggleShowOverlay() {
             flashFade(overlayEl)
         } else {
             overlayEl.style.display = 'none'
+            settings.style.display = 'none'
         }
     }
 }
@@ -523,8 +539,10 @@ const updateOverlayPosition = () => {
         : (settings.position = DEFAULT_SETTINGS.position)
 
     // sanity check border overflowing video player
-    if (current.width + current.left > 1) settings.position = DEFAULT_SETTINGS.position
-    if (current.height + current.top > 1) settings.position = DEFAULT_SETTINGS.position
+    if (current.width + current.left > 1)
+        settings.position = DEFAULT_SETTINGS.position
+    if (current.height + current.top > 1)
+        settings.position = DEFAULT_SETTINGS.position
 
     chrome.storage.local.set({ overlaySettings: settings })
 }

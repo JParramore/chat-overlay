@@ -4,7 +4,8 @@ const TC_CLASSES = {
     overlayLive: 'tc-overlay-live',
     overlayVod: 'tc-overlay-vod',
     overlayVodChat: 'tc-overlay-vod-chat',
-    overlayButtonsContainer: 'tc-buttons-container',
+    overlayButtonsContainer: 'tc-ol-buttons-container',
+    settingsButtonsContainer: 'tc-settings-buttons-container',
     overlayButton: 'tc-overlay-button',
     buttonWrapper: 'tc-button-wrapper',
     vodMessage: 'tc-vod-message',
@@ -489,35 +490,6 @@ const setDraggable = (draggable, container, frame) => {
         let frameBody = frame ? frame.contentWindow.document.body : null
         if (frameBody) {
             frameBody.onmouseup = null
-        }
-    }
-}
-
-const animateShowComponent = (ElSelector, offsetElSelector) => {
-    var elem = document.querySelector(ElSelector)
-    let offset = document.querySelector(offsetElSelector).offsetHeight
-    let isOpen
-
-    if (elem.classList.contains('tc-open')) {
-        isOpen = true
-        elem.classList.remove('tc-open')
-        elem.classList.add('tc-closed')
-    } else {
-        isOpen = false
-        elem.classList.remove('tc-closed')
-        elem.classList.add('tc-open')
-    }
-    let posInterval = offset / 100
-    var pos = 0
-    let start = elem.offsetTop
-    var id = setInterval(frame, 2)
-    let moveDistance = offset
-    function frame() {
-        if (pos >= moveDistance) {
-            clearInterval(id)
-        } else {
-            pos += posInterval
-            elem.style.top = isOpen ? `${start + pos}px` : `${start - pos}px`
         }
     }
 }
