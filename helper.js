@@ -38,6 +38,7 @@ const TW_CLASSES = {
     liveChat: 'stream-chat',
     vodChat: 'qa-vod-chat',
     vodChatListWrapper: 'video-chat__message-list-wrapper',
+    backgroundAlt: 'tw-c-background-alt',
     display: ['tw-flex', 'tw-block', 'tw-inline-flex'],
     buttons: {
         coreButton: [
@@ -325,6 +326,9 @@ const observeVodChat = twMessageWrapper => {
                 badge.classList.add(`${TC_CLASSES.chatBadgeHide}`)
             )
         listContainer.appendChild(clone)
+
+        let hasBG = clone.querySelector(`.${TW_CLASSES.backgroundAlt}`)
+        if (hasBG) hasBG.classList.remove(TW_CLASSES.backgroundAlt)
 
         let count = listContainer.childNodes.length
         while (count-- > 100) listContainer.firstChild.remove()
