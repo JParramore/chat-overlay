@@ -330,6 +330,9 @@ const observeVodChat = twMessageWrapper => {
         let hasBG = clone.querySelector(`.${TW_CLASSES.backgroundAlt}`)
         if (hasBG) hasBG.classList.remove(TW_CLASSES.backgroundAlt)
 
+        let timeStamp = clone.querySelector('div[data-test-selector="message-timestamp"]') // remove timestamps?
+        if (timeStamp) timeStamp.remove()
+
         let count = listContainer.childNodes.length
         while (count-- > 100) listContainer.firstChild.remove()
 
