@@ -354,7 +354,7 @@ function buildToggleOverlayButton() {
     const twButtonClasses = TW_CLASSES.buttons.overlayButton
 
     let container = document.createElement('div')
-    container.className = 'tw-tooltip__container tw-relative'
+    container.className = 'tw-tooltip__container tw-relative sc-AxjAm ScAttachedTooltipWrapper-v8mg6d-0 dLtTlU'
     container.classList.add(overlayButton)
 
     let button = document.createElement('button')
@@ -363,7 +363,9 @@ function buildToggleOverlayButton() {
     button.onclick = toggleShowOverlay
 
     let tooltip = document.createElement('div')
-    tooltip.className = 'tw-tooltip tw-tooltip--align-right tw-tooltip--up'
+    tooltip.className = 'tw-tooltip jouePo ScAttachedTooltip-v8mg6d-1'
+    tooltip.setAttribute('data-a-target', 'tw-tooltip-label')
+    tooltip.direction = 'tw-tooltip--up'
     tooltip.role = 'tooltip'
     tooltip.innerHTML = 'Chat Overlay (o)'
 

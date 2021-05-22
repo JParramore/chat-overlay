@@ -40,7 +40,7 @@ const TW_CLASSES = {
     vodChat: 'qa-vod-chat',
     vodChatListWrapper: 'video-chat__message-list-wrapper',
     backgroundAlt: 'tw-c-background-alt',
-    display: ['tw-flex', 'tw-block', 'tw-inline-flex'],
+    display: ['tw-flex', 'tw-block', 'tw-inline-flex', 'jGtCgK', 'ffqcOp', 'jbKovw'],
     buttons: {
         coreButton: [
             'tw-core-button--primary',
@@ -304,7 +304,7 @@ const observeVodChat = twMessageWrapper => {
             mutation.addedNodes.forEach(node => {
                 if (window.location.pathname !== pathname)
                     vodObserver.disconnect()
-                if (node.matches(`li[class="tw-full-width`)) addNewMessage(node)
+                if (node.matches(`li[class="InjectLayout-sc-588ddc-0 gDeqEh`)) addNewMessage(node)
             })
         }
     })
