@@ -40,7 +40,7 @@ const TW_CLASSES = {
     vodChat: 'qa-vod-chat',
     vodChatListWrapper: 'video-chat__message-list-wrapper',
     backgroundAlt: 'tw-c-background-alt',
-    display: ['tw-flex', 'tw-block', 'tw-inline-flex', 'jGtCgK', 'ffqcOp', 'jbKovw', 'OsGMV'],
+    display: ['tw-flex', 'tw-block', 'tw-inline-flex', 'jGtCgK', 'ffqcOp', 'jbKovw', 'OsGMV', 'hWwloK'],
     buttons: {
         coreButton: [
             'tw-core-button--primary',
