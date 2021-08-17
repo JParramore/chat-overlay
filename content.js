@@ -367,7 +367,7 @@ function buildToggleOverlayButton() {
     tooltip.setAttribute('data-a-target', 'tw-tooltip-label')
     tooltip.direction = 'tw-tooltip--up'
     tooltip.role = 'tooltip'
-    tooltip.innerHTML = 'Chat Overlay (o)'
+    // tooltip.innerHTML = 'Chat Overlay (o)'
 
     button.innerHTML = OVERLAY_BTN_SVG
     container.appendChild(button)
