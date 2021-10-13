@@ -40,7 +40,7 @@ const TW_CLASSES = {
     vodChat: 'qa-vod-chat',
     vodChatListWrapper: 'video-chat__message-list-wrapper',
     backgroundAlt: 'tw-c-background-alt',
-    display: ['tw-flex', 'tw-block', 'tw-inline-flex', 'jGtCgK', 'ffqcOp', 'jbKovw', 'OsGMV', 'hWwloK', 'coTOOz', 'enaiRw'],
+    display: ['tw-flex', 'tw-block', 'tw-inline-flex', 'jGtCgK', 'ffqcOp', 'jbKovw', 'OsGMV', 'hWwloK', 'coTOOz', 'enaiRw', 'gnaiJY', 'kuXtDX', 'irkKdr', 'eMZPSy'],
     buttons: {
         coreButton: [
             'tw-core-button--primary',
@@ -53,7 +53,7 @@ const TW_CLASSES = {
             'ScCoreButton-sc-1qn4ixc-0',
             'ScCoreButtonPrimary-sc-1qn4ixc-1',
         ],
-        coreLabel: ['tw-core-button-label', 'xsINH'],
+        coreLabel: ['tw-core-button-label', 'xsINH', 'evtFDZ'],
         overlayButton: [
             'tw-align-items-center',
             'tw-align-middle',
