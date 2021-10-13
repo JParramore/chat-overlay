@@ -425,12 +425,12 @@ function addOverlayFunctions(overlay, buttons, frame) {
         buttons.style.visibility = 'visible'
         if (input) input.classList.remove('chat-input__hide')
     }
-    // overlay.onmouseout = () => {
-    //     overlay.style.border = '2px solid transparent'
-    //     overlay.style.resize = 'none'
-    //     buttons.style.visibility = 'hidden'
-    //     if (input) input.classList.add('chat-input__hide')
-    // }
+    overlay.onmouseout = () => {
+        overlay.style.border = '2px solid transparent'
+        overlay.style.resize = 'none'
+        buttons.style.visibility = 'hidden'
+        if (input) input.classList.add('chat-input__hide')
+    }
 }
 
 // when user makes changes to theme change styles and save to local storage
